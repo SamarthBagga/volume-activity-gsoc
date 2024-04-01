@@ -122,6 +122,9 @@ body {
 #main-toolbar #reset-button {
   background-image: url(../icons/restart.svg);
 }
+#main-toolbar #image-button {
+  background-image: url(../icons/image.svg);
+}
 body {
 	margin: 0;
 	color: var(--color-text);

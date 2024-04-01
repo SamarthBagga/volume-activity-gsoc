@@ -6,6 +6,8 @@ define([
   './palettes/colorpalette',
   'sugar-web/graphics/presencepalette',
   'tutorial',
+  'sugar-web/graphics/journalchooser',
+  "sugar-web/datastore",
 ], function (
   activity,
   env,
@@ -14,6 +16,8 @@ define([
   colorpalette,
   presencepalette,
   tutorial,
+  journalchooser,
+  datastore
 ) {
   // Function to change the background color based on the provided string
   requirejs(['domReady!'], function (doc) {
@@ -46,6 +50,8 @@ define([
     let lastRoll = ''
     let diceArray = []
     let showNumbers = false
+    let showImage = false
+    let imageData;
     let presentColor = '#0000ff'
     let textColor = '#ffffff'
     document.getElementById('color-button').style.backgroundColor = presentColor
@@ -78,7 +84,6 @@ define([
         console.log('returbign')
         return
       }
-      console.log(msg.action)
       if (msg.action == 'throw') {
         throwDice()
       }
@@ -99,6 +104,8 @@ define([
             msg.content.ifTransparent,
             msg.content.xCoordinateShared,
             msg.content.zCoordinateShared,
+            msg.content.ifImage,
+            msg.content.sharedImageData
           )
           break
         case 'octa':
@@ -108,15 +115,20 @@ define([
             msg.content.ifTransparent,
             msg.content.xCoordinateShared,
             msg.content.zCoordinateShared,
+            msg.content.ifImage,
+            msg.content.sharedImageData
           )
           break
         case 'tetra':
+          console.log(msg.content.ifImage)
           createTetrahedron(
             msg.content.color,
             msg.content.ifNumbers,
             msg.content.ifTransparent,
             msg.content.xCoordinateShared,
             msg.content.zCoordinateShared,
+            msg.content.ifImage,
+            msg.content.sharedImageData
           )
           break
       }
@@ -179,6 +191,11 @@ define([
         transparentButton.classList.toggle('active')
         toggleTransparent = !toggleTransparent
       }
+      if (showImage) {
+        var imageButton1 = document.getElementById('image-button')
+        imageButton1.classList.toggle('active')
+        showImage = !showImage
+      }
       showNumbers = !showNumbers
       // toggleNumbers();
     })
@@ -205,6 +222,11 @@ define([
           var numberButton = document.getElementById('number-button')
           numberButton.classList.toggle('active')
           showNumbers = !showNumbers
+        }
+        if (showImage) {
+          var imageButton1 = document.getElementById('image-button')
+          imageButton1.classList.toggle('active')
+          showImage = !showImage
         }
         toggleTransparent = !toggleTransparent
       })
@@ -238,6 +260,59 @@ define([
         addCube = !addCube
       }
     })
+    const imageButton = document.getElementById('image-button')
+    document
+      .getElementById('image-button')
+      .addEventListener('click', function (e) {
+        if (showImage) {
+          showImage = !showImage
+          imageButton.classList.toggle('active')
+          console.log('doing stuff onw')
+          return
+        }
+        journalchooser.show(
+          function (entry) {
+            // No selection
+            if (!entry) {
+              return
+            }
+            // Get object content
+            imageButton.classList.add('active')
+            showImage = !showImage
+
+            if (toggleTransparent) {
+              var transparentButton =
+                document.getElementById('transparent-button')
+              transparentButton.classList.toggle('active')
+              toggleTransparent = !toggleTransparent
+            }
+
+            if (showNumbers) {
+              var numberButton = document.getElementById('number-button')
+              numberButton.classList.toggle('active')
+              showNumbers = !showNumbers
+            }
+
+            var dataentry = new datastore.DatastoreObject(entry.objectId)
+            dataentry.loadAsText(function (err, metadata, data) {
+              imageData = data
+              console.log(data);
+              // if (addCube) {
+              //   console.log(data)
+              //   imageData = data;
+              //   console.log(imageData)
+              //   createCube()
+              // }
+              // if (addTetra) {
+              // }
+              // if (addOcta) {
+              // }
+            })
+          },
+          { mimetype: 'image/png' },
+          { mimetype: 'image/jpeg' },
+        )
+      })
 
     tetra.addEventListener('click', function () {
       if (!tetra.classList.contains('active')) {
@@ -390,6 +465,8 @@ define([
                     ifNumbers: showNumbers,
                     xCoordinateShared: xCoordinate,
                     zCoordinateShared: zCoordinate,
+                    ifImage: showImage,
+                    sharedImageData: imageData
                   },
                 })
               }
@@ -405,12 +482,15 @@ define([
                     ifNumbers: showNumbers,
                     xCoordinateShared: xCoordinate,
                     zCoordinateShared: zCoordinate,
+                    ifImage: showImage,
+                    sharedImageData: imageData
                   },
                 })
               }
             } else {
               createOctahedron()
               if (presence) {
+                console.log(showImage);
                 presence.sendMessage(presence.getSharedInfo().id, {
                   user: presence.getUserInfo(),
                   content: {
@@ -420,6 +500,8 @@ define([
                     ifNumbers: showNumbers,
                     xCoordinateShared: xCoordinate,
                     zCoordinateShared: zCoordinate,
+                    ifImage: showImage,
+                    sharedImageData: imageData
                   },
                 })
               }
@@ -630,49 +712,42 @@ define([
     orbit.update()
     orbit.listenToKeyEvents(document.querySelector('body'))
 
-    
-
     const goRightButton = document.querySelector('#right-button')
-    const goLeftButton = document.querySelector('#left-button')  
-    const goUpButton = document.querySelector('#up-button')   
-    const goDownButton = document.querySelector('#down-button')   
+    const goLeftButton = document.querySelector('#left-button')
+    const goUpButton = document.querySelector('#up-button')
+    const goDownButton = document.querySelector('#down-button')
 
     // Add click event listener to the button
     goRightButton.addEventListener('click', function () {
-      orbit.rotateRight();
+      orbit.rotateRight()
     })
 
     goLeftButton.addEventListener('click', function () {
-      orbit.rotateLeft();
+      orbit.rotateLeft()
     })
     goUpButton.addEventListener('click', function () {
-      orbit.rotateUp();
+      orbit.rotateUp()
     })
     goDownButton.addEventListener('click', function () {
-      orbit.rotateDown();
+      orbit.rotateDown()
     })
-
     // Zoom code
     const evt = new Event('wheel', { bubbles: true, cancelable: true })
 
     const zoomInButton = document.getElementById('zoom-in-button')
     const zoomOutButton = document.getElementById('zoom-out-button')
-    const zoomInFunction = e => {
 
+    const zoomInFunction = e => {
       const fov = getFov()
       camera.fov = clickZoom(fov, 'zoomIn')
       camera.updateProjectionMatrix()
     }
-
-    zoomInButton.addEventListener('click', zoomInFunction)
 
     const zoomOutFunction = e => {
       const fov = getFov()
       camera.fov = clickZoom(fov, 'zoomOut')
       camera.updateProjectionMatrix()
     }
-
-    zoomOutButton.addEventListener('click', zoomOutFunction)
 
     const clickZoom = (value, zoomType) => {
       if (value >= 20 && zoomType === 'zoomIn') {
@@ -693,17 +768,23 @@ define([
       )
     }
 
+    zoomInButton.addEventListener('click', zoomInFunction)
+    zoomOutButton.addEventListener('click', zoomOutFunction)
+
     function createTetrahedron(
       sharedColor,
       ifNumbers,
       ifTransparent,
       xCoordinateShared,
       zCoordinateShared,
+      ifImage,
+      sharedImageData
     ) {
       let tetrahedron
       let tempShowNumbers = ifNumbers == null ? showNumbers : ifNumbers
       let tempTransparent =
         ifTransparent == null ? toggleTransparent : ifTransparent
+      let tempImage = ifImage == null ? showImage : ifImage
       if (tempShowNumbers) {
         let tileDimension = new THREE.Vector2(4, 5)
         let tileSize = 512
@@ -780,7 +861,7 @@ define([
 
         tetrahedron = new THREE.Mesh(g, m)
       } else if (tempTransparent) {
-        const tetrahedronTransparentGeometry = new THREE.TetrahedronGeometry(2) // Size of the octahedron
+        const tetrahedronTransparentGeometry = new THREE.TetrahedronGeometry(2) // Size of the tetrahedron
         const wireframe = new THREE.WireframeGeometry(
           tetrahedronTransparentGeometry,
         )
@@ -792,6 +873,17 @@ define([
         })
         const line = new THREE.LineSegments(wireframe, lineMaterial)
         tetrahedron = line
+      } else if (tempImage) {
+        const boxGeo = new THREE.TetrahedronGeometry(2)
+
+        const texture = new THREE.TextureLoader().load(sharedImageData != null ? sharedImageData : imageData)
+        
+        
+        // Create material using the texture
+        const material = new THREE.MeshPhongMaterial({ map: texture })
+
+        // Create cube mesh with the material
+        tetrahedron = new THREE.Mesh(boxGeo, material)
       } else {
         const tetrahedronGeometry = new THREE.TetrahedronGeometry(2) // Size of the tetrahedron
 
@@ -813,24 +905,18 @@ define([
         new CANNON.Vec3(-1, 1, -1), // Vertex 3 (left)
         new CANNON.Vec3(1, -1, -1), // Vertex 4 (front)
       ]
-
-      // Define the faces of the tetrahedron (counter-clockwise order)
       const facesTetra = [
         [2, 1, 0], // Triangle 1 (right, top, left)
         [0, 3, 2], // Triangle 2 (right, front, top)
         [1, 3, 0], // Triangle 3 (top, front, left)
         [2, 3, 1], // Triangle 4 (left, right, front)
       ]
-      // const normalsTetra = computeFaceNormals(verticesTetra, facesTetra);
-
       // Create a ConvexPolyhedron shape from the vertices and faces
       const tetrahedronShape = new CANNON.ConvexPolyhedron({
         vertices: verticesTetra,
         faces: facesTetra,
       })
 
-      // Normals are not automatically calculated by Cannon.es for ConvexPolyhedrons.
-      // You can calculate them yourself for each face if needed.
       let x = xCoordinateShared == null ? xCoordinate : xCoordinateShared
       let z = zCoordinateShared == null ? zCoordinate : zCoordinateShared
 
@@ -864,11 +950,14 @@ define([
       ifTransparent,
       xCoordinateShared,
       zCoordinateShared,
+      ifImage,
+      sharedImageData
     ) {
       let octahedron
       let tempShowNumbers = ifNumbers == null ? showNumbers : ifNumbers
       let tempTransparent =
         ifTransparent == null ? toggleTransparent : ifTransparent
+      let tempImage = ifImage == null ? showImage : ifImage
       if (tempShowNumbers) {
         let tileDimension = new THREE.Vector2(4, 5)
         let tileSize = 512
@@ -936,6 +1025,17 @@ define([
         })
         const line = new THREE.LineSegments(wireframe, lineMaterial)
         octahedron = line
+      } else if (tempImage) {
+        const octahedronGeometry = new THREE.OctahedronGeometry(2)
+
+        const texture = new THREE.TextureLoader().load(sharedImageData != null ? sharedImageData : imageData)
+        
+        
+        // Create material using the texture
+        const material = new THREE.MeshPhongMaterial({ map: texture })
+
+        // Create cube mesh with the material
+        octahedron = new THREE.Mesh(octahedronGeometry, material)
       } else {
         const octahedronGeometry = new THREE.OctahedronGeometry(2) // Size of the octahedron
 
@@ -1007,11 +1107,14 @@ define([
       ifTransparent,
       xCoordinateShared,
       zCoordinateShared,
+      ifImage,
+      sharedImageData
     ) {
       let boxMesh
       let tempShowNumbers = ifNumbers == null ? showNumbers : ifNumbers
       let tempTransparent =
         ifTransparent == null ? toggleTransparent : ifTransparent
+      let tempImage = ifImage == null ? showImage : ifImage;
       if (tempShowNumbers) {
         let tileDimension = new THREE.Vector2(4, 2)
         let tileSize = 512
@@ -1078,7 +1181,18 @@ define([
         })
         const line = new THREE.LineSegments(wireframe, lineMaterial)
         boxMesh = line
-      } else {
+      } else if (tempImage) {
+        const boxGeo = new THREE.BoxGeometry(2, 2, 2)
+
+        const texture = new THREE.TextureLoader().load(sharedImageData != null ? sharedImageData : imageData)
+        
+        
+        // Create material using the texture
+        const material = new THREE.MeshPhongMaterial({ map: texture })
+
+        // Create cube mesh with the material
+        boxMesh = new THREE.Mesh(boxGeo, material)
+      }  else {
         const boxGeo = new THREE.BoxGeometry(2, 2, 2)
         const boxMat = new THREE.MeshPhongMaterial({
           color: sharedColor != null ? sharedColor : presentColor,
@@ -1229,7 +1343,6 @@ define([
       updateElements()
     }
     function getCubeScore(body) {
-      console.log(body)
       const faceVectors = [
         {
           vector: new THREE.Vector3(1, 0, 0),

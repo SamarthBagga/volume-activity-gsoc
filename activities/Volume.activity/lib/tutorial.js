@@ -55,6 +55,11 @@ define([], function () {
         intro: 'Select this to add transparent volumes. This works with the earlier volume buttons, keep this and any one of the volume buttons selected and click on the board to add transparent volumes to the board.',
       },
       {
+        element: '#image-button',
+        title: 'Add images to the sides of the volume',
+        intro: 'Select this to add volumes with images on their sides. You can select an image from the journal to apply it to the volumes. This works with the earlier volume buttons, keep this and any one of the volume buttons selected and click on the board to add image volumes to the board.',
+      },
+      {
         element: '#solid-button',
         title: 'Make all volumes transparent',
         intro: 'Toggle this button to make all the volumes added on the board transparent.',

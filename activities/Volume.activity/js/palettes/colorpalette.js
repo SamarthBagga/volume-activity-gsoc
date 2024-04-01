@@ -28,7 +28,6 @@ define([
           detail: { color: selectedColor },
         });
         document.dispatchEvent(colorChangeEvent);
-
         that.popDown();
       });
     });
