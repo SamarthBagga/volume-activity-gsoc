@@ -38,10 +38,10 @@ define([
       }
       changeBoardBackground(selectedBoard)
     }
-    // var paletteVolume = new volumepalette.VolumePalette(
-    //   document.getElementById('volume-button'),
-    //   undefined,
-    // )
+    var paletteVolume = new volumepalette.VolumePalette(
+      document.getElementById('volume-button'),
+      undefined,
+    )
     var paletteColor = new colorpalette.ColorPalette(
       document.getElementById('color-button'),
       undefined,
@@ -169,23 +169,24 @@ define([
     })
 
     // Toggles the dice's transparency
-    document.querySelector('#solid-button').addEventListener('click', () => {
-      if (!transparent) {
-        document.querySelector('#solid-button').style.backgroundImage =
-          'url(icons/cube.svg)'
-      } else {
-        document.querySelector('#solid-button').style.backgroundImage =
-          'url(icons/cube_solid.svg)'
-      }
-      transparent = !transparent
-      toggleTransparency()
-    })
+    // document.querySelector('#solid-button').addEventListener('click', () => {
+    //   if (!transparent) {
+    //     document.querySelector('#solid-button').style.backgroundImage =
+    //       'url(icons/cube.svg)'
+    //   } else {
+    //     document.querySelector('#solid-button').style.backgroundImage =
+    //       'url(icons/cube_solid.svg)'
+    //   }
+    //   transparent = !transparent
+    //   toggleTransparency()
+    // })
 
     // Toggles showing numbers on dice
 
     document.querySelector('#number-button').addEventListener('click', () => {
       var numberButton = document.getElementById('number-button')
       numberButton.classList.toggle('active')
+      document.getElementById("volume-button").style.backgroundImage = 'url(icons/number_on.svg)'
       if (toggleTransparent) {
         var transparentButton = document.getElementById('transparent-button')
         transparentButton.classList.toggle('active')
@@ -218,6 +219,8 @@ define([
         var transparentButton = document.getElementById('transparent-button')
         // Toggle the 'active' class on the clear button
         transparentButton.classList.toggle('active')
+        document.getElementById("volume-button").style.backgroundImage = 'url(icons/tess.png)'
+
         if (showNumbers) {
           var numberButton = document.getElementById('number-button')
           numberButton.classList.toggle('active')
@@ -238,6 +241,61 @@ define([
     var tetra = document.getElementById('tetra-button')
     var octa = document.getElementById('octa-button')
 
+
+    // const imageButton = document.getElementById('image-button')
+    // document
+    //   .getElementById('image-button')
+    //   .addEventListener('click', function (e) {
+    //     if (showImage) {
+    //       showImage = !showImage
+    //       imageButton.classList.toggle('active')
+    //       console.log('doing stuff onw')
+    //       return
+    //     }
+    //     journalchooser.show(
+    //       function (entry) {
+    //         // No selection
+    //         if (!entry) {
+    //           return
+    //         }
+    //         // Get object content
+    //         imageButton.classList.add('active')
+    //         showImage = !showImage
+
+    //         if (toggleTransparent) {
+    //           var transparentButton =
+    //             document.getElementById('transparent-button')
+    //           transparentButton.classList.toggle('active')
+    //           toggleTransparent = !toggleTransparent
+    //         }
+
+    //         if (showNumbers) {
+    //           var numberButton = document.getElementById('number-button')
+    //           numberButton.classList.toggle('active')
+    //           showNumbers = !showNumbers
+    //         }
+
+    //         var dataentry = new datastore.DatastoreObject(entry.objectId)
+    //         dataentry.loadAsText(function (err, metadata, data) {
+    //           imageData = data
+    //           console.log(data);
+    //           // if (addCube) {
+    //           //   console.log(data)
+    //           //   imageData = data;
+    //           //   console.log(imageData)
+    //           //   createCube()
+    //           // }
+    //           // if (addTetra) {
+    //           // }
+    //           // if (addOcta) {
+    //           // }
+    //         })
+    //       },
+    //       { mimetype: 'image/png' },
+    //       { mimetype: 'image/jpeg' },
+    //     )
+    //   })
+
     // Add click event listeners to each div
     cube.addEventListener('click', function () {
       if (!cube.classList.contains('active')) {
@@ -249,6 +307,7 @@ define([
         remove_button.classList.remove('active')
         tetra.classList.remove('active')
         octa.classList.remove('active')
+
         if (transparent) {
           transparent = false
           document.querySelector('#solid-button').style.backgroundImage =
@@ -260,60 +319,7 @@ define([
         addCube = !addCube
       }
     })
-    const imageButton = document.getElementById('image-button')
-    document
-      .getElementById('image-button')
-      .addEventListener('click', function (e) {
-        if (showImage) {
-          showImage = !showImage
-          imageButton.classList.toggle('active')
-          console.log('doing stuff onw')
-          return
-        }
-        journalchooser.show(
-          function (entry) {
-            // No selection
-            if (!entry) {
-              return
-            }
-            // Get object content
-            imageButton.classList.add('active')
-            showImage = !showImage
-
-            if (toggleTransparent) {
-              var transparentButton =
-                document.getElementById('transparent-button')
-              transparentButton.classList.toggle('active')
-              toggleTransparent = !toggleTransparent
-            }
-
-            if (showNumbers) {
-              var numberButton = document.getElementById('number-button')
-              numberButton.classList.toggle('active')
-              showNumbers = !showNumbers
-            }
-
-            var dataentry = new datastore.DatastoreObject(entry.objectId)
-            dataentry.loadAsText(function (err, metadata, data) {
-              imageData = data
-              console.log(data);
-              // if (addCube) {
-              //   console.log(data)
-              //   imageData = data;
-              //   console.log(imageData)
-              //   createCube()
-              // }
-              // if (addTetra) {
-              // }
-              // if (addOcta) {
-              // }
-            })
-          },
-          { mimetype: 'image/png' },
-          { mimetype: 'image/jpeg' },
-        )
-      })
-
+    
     tetra.addEventListener('click', function () {
       if (!tetra.classList.contains('active')) {
         addCube = false

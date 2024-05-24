@@ -4,6 +4,13 @@
 #main-toolbar #network-button {
 	background-image: url(../lib/sugar-web/graphics/icons/actions/zoom-home.svg);
 }
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+}
+.left-container {
+  display: flex;
+}
 
 #private-button {
 	background-image: url(../lib/sugar-web/graphics/icons/actions/zoom-home.svg);
@@ -42,8 +49,8 @@ body {
   background-image: url(../icons/insert-picture.svg);
   outline: none;
 }
-#main-toolbar #volume-button {
-  background-image: url(../icons/add.svg);
+#volume-button {
+  background-image:url(../icons/cube.svg);
   outline:none;
 }
 #main-toolbar #clear-button {
@@ -57,13 +64,27 @@ body {
 
 #main-toolbar #solid-button {
   background-image: url(../icons/cube_solid.svg);
+  height: 100px;
+  width: 65px;
+  background-size: cover;
+  background-repeat: no-repeat;
   outline:none;
 }
-#main-toolbar #number-button {
+#number-button {
+  height: 65px;
+  width: 65px;
+  background-size: cover;
+  background-repeat: no-repeat;
   background-image: url(../icons/number_on.svg);
   outline:none;
 }
-#main-toolbar #transparent-button {
+#transparent-button {
+  margin: 0;
+  padding: 0;
+  height: 65px;
+  width: 65px;
+  background-size: contain;
+  background-repeat: no-repeat;
   background-image: url(../icons/tess.png);
   outline:none;
 }
@@ -71,24 +92,41 @@ body {
 #colors-button-fill{
   display: none;
 }
-
+.button-background {
+  background-color:#000;
+}
 #cube-button {
   background-image:url(../icons/cube.svg);
   outline:none;
-
-
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 #tetra-button {
   background-image:url(../icons/tetra.svg);
   outline:none;
-
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 #octa-button {
   background-image:url(../icons/octa.svg);
   outline:none;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
+.active {
+  background-color: #e1e1e1; 
+}
+
 #main-toolbar #help-button {
 	background-image: url(../icons/help.svg);
+}
+.vertical-line {
+  width: 5px; 
+  height: 55px; 
+  background-color: white; 
+  transform: translateX(-50%);
+  margin-left: 5px;
+  margin-right: 5px;
 }
 
 .selector {
@@ -274,7 +312,7 @@ body {
   font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
   color : #ffffff;
   text-shadow: none;
-  background-color: #808080;
+  /* background-color: #808080; */
   margin: 0;
   padding: 0px 10px;
   border-bottom: 1px solid #ebebeb;
@@ -341,7 +379,7 @@ body {
   border-radius: 22px;
   margin: 5px 8px 8px 8px;
   width: fit-content;
-  background-color: #808080 !important;
+  /* background-color: #808080 !important; */
   display: flex !important;
   align-items: center !important;
   color: white !important;
@@ -353,7 +391,7 @@ body {
   -webkit-box-shadow: 0 0 0 0rem rgba(158, 158, 158, .5);
   box-shadow: 0 0 0 0rem rgba(158, 158, 158, .5);
   border: 0px;
-  background-color: #808080 !important;
+  /* background-color: #808080 !important; */
 }
 
 .customTooltip .introjs-disabled {
