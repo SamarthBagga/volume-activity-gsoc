@@ -539,8 +539,6 @@
 			}
 
 			function rotateLeft( angle ) {
-				console.log("now it hzs to work")
-
 				sphericalDelta.theta -= angle;
 
 			}

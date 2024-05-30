@@ -4,6 +4,7 @@ define([
   './palettes/bgpalette',
   './palettes/volumepalette',
   './palettes/colorpalette',
+  './palettes/zoompalette',
   'sugar-web/graphics/presencepalette',
   'tutorial',
   'sugar-web/graphics/journalchooser',
@@ -14,6 +15,7 @@ define([
   bgpalette,
   volumepalette,
   colorpalette,
+  zoompalette,
   presencepalette,
   tutorial,
   journalchooser,
@@ -42,6 +44,10 @@ define([
       document.getElementById('volume-button'),
       undefined,
     )
+    var paletteZoom = new zoompalette.ZoomPalette(
+      document.getElementById('zoom-button'),
+      undefined,
+    )
     var paletteColor = new colorpalette.ColorPalette(
       document.getElementById('color-button'),
       undefined,
@@ -52,9 +58,8 @@ define([
     let showNumbers = false
     let showImage = false
     let imageData;
-    let presentColor = '#0000ff'
+    let presentColor;
     let textColor = '#ffffff'
-    document.getElementById('color-button').style.backgroundColor = presentColor
     var currentenv
     let removeVolume = false
     env.getEnvironment(function (err, environment) {
@@ -64,12 +69,17 @@ define([
         currentenv.user.colorvalue.fill != null
           ? currentenv.user.colorvalue.fill
           : presentColor
+        
+      scene.background = new THREE.Color(presentColor)
+
+      
       textColor =
         currentenv.user.colorvalue.stroke != null
           ? currentenv.user.colorvalue.stroke
           : textColor
       document.getElementById('color-button').style.backgroundColor =
         presentColor
+      
 
       if (environment.sharedId) {
         console.log('Shared instance')
@@ -419,13 +429,13 @@ define([
     //     }
     //   })
 
-    const totalScoreElement = document.getElementById('score')
+    // const totalScoreElement = document.getElementById('score')
     const lastRollElement = document.getElementById('roll')
 
     // Function to update the elements
     function updateElements() {
-      totalScoreElement.textContent = presentScore
-      lastRollElement.textContent = lastRoll
+      // totalScoreElement.textContent = presentScore
+      lastRollElement.textContent = lastRoll + '=' + presentScore;
     }
 
     const renderer = new THREE.WebGLRenderer({
@@ -566,27 +576,27 @@ define([
       })
     })
 
-    document
-      .querySelector('#reset-button')
-      .addEventListener('click', function () {
-        presentScore = 0
-        totalScoreElement.textContent = 0
-        lastRoll = ''
-        lastRollElement.textContent = ''
-        if (presence) {
-          presence.sendMessage(presence.getSharedInfo().id, {
-            user: presence.getUserInfo(),
-            action: 'resetScore',
-          })
-        }
-      })
-
+    // document
+    //   .querySelector('#reset-button')
+    //   .addEventListener('click', function () {
+    //     presentScore = 0
+    //     totalScoreElement.textContent = 0
+    //     lastRoll = ''
+    //     lastRollElement.textContent = ''
+    //     if (presence) {
+    //       presence.sendMessage(presence.getSharedInfo().id, {
+    //         user: presence.getUserInfo(),
+    //         action: 'resetScore',
+    //       })
+    //     }
+    //   })
+    let sleepCounter = 0;
     renderer.setSize(window.innerWidth, window.innerHeight)
     const canvas = document.getElementById('game-container')
     document.getElementById('game-container').appendChild(renderer.domElement)
 
     const scene = new THREE.Scene()
-    scene.background = new THREE.Color(0x192a52)
+    scene.background = new THREE.Color(presentColor)
     const light = new THREE.DirectionalLight(0xffffff, 0.7)
     light.castShadow = true
     const leftLight = new THREE.DirectionalLight(0xffffff, 0.25)
@@ -935,6 +945,7 @@ define([
       })
       if (tempShowNumbers) {
         tetrahedronBody.addEventListener('sleep', () => {
+          sleepCounter++;
           getTetraScore(tetrahedron)
         })
       }
@@ -1091,6 +1102,7 @@ define([
       })
       if (tempShowNumbers) {
         octahedronBody.addEventListener('sleep', () => {
+          sleepCounter++;
           getOctaScore(octahedron)
         })
       }
@@ -1227,6 +1239,7 @@ define([
       world.addBody(boxBody)
       if (tempShowNumbers) {
         boxBody.addEventListener('sleep', () => {
+          sleepCounter++;
           getCubeScore(boxMesh)
         })
       }
@@ -1262,6 +1275,7 @@ define([
       }
       if (diceArray.length > 0) {
         lastRoll = ''
+        presentScore = 0
         for (let i = 0; i < diceArray.length; i++) {
           diceArray[i][1].angularVelocity.set(
             Math.random() - 0.5,

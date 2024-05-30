@@ -29,8 +29,17 @@ define([
 
     function onClick(event) {
       that.bgSelectedEvent.bg = event.currentTarget.id;
-      console.log("it is happening");
-      // Call the background change callback set from activity.js
+      if (document.querySelector("#green-board").classList.contains("active")) {
+        document.querySelector("#green-board").classList.remove("active");
+      }
+      if (document.querySelector("#wood").classList.contains("active")) {
+        document.querySelector("#wood").classList.remove("active");
+      }
+      if (document.querySelector("#default").classList.contains("active")) {
+        document.querySelector("#default").classList.remove("active");
+      }
+      event.currentTarget.classList.add("active");
+
       if (backgroundChangeCallback) {
         backgroundChangeCallback(that.bgSelectedEvent.bg);
       }

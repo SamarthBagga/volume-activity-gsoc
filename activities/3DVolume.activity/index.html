@@ -3,7 +3,7 @@
 
 <head>
 <meta charset="utf-8" />
-<title>Volume Activity</title>
+<title>3D Volume Activity</title>
 <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, viewport-fit=cover"/>
 <link rel="stylesheet" media="not screen and (device-width: 1200px) and (device-height: 900px)"
 	href="lib/sugar-web/graphics/css/sugar-96dpi.css">
@@ -55,12 +55,15 @@
     <button class="toolbutton" id="bg-button" title="Change Playmat"></button>
   
     <div class="vertical-line"></div>
+
+    <button class="toolbutton" id="zoom-button" title="zoom palette"></button>
+
+    <button class="toolbutton" id="throw-button" title="Throw the dice"></button>
+
   
-    <button class="toolbutton" id="zoom-in-button" title="Zoom in button"></button>
-    <button class="toolbutton" id="zoom-out-button" title="Zoom out button"></button>
   </div>
 
-  <button class="toolbutton" id="reset-button" title="Reset Values"></button>
+  <!-- <button class="toolbutton" id="reset-button" title="Reset Values"></button> -->
   <!-- <button class="toolbutton" id="volume-button" title="Add a volume"></button> -->
 
   <!-- <button class="toolbutton" id="solid-button" title="Make all volumes transparent"></button> -->
@@ -76,10 +79,9 @@
 
 </div>
 <div id="game-container">
-  <button id="throw-button">Throw the Dice</button>
+  <!-- <button id="throw-button">Throw the Dice</button> -->
   <div id="score-container">
-    <p id="total-score">Total Score: <span id="score">0</span> </p>
-    <p id="last-roll">Last Roll: <span id="roll"></span> </p>
+    <!-- <p id="total-score">Total Score: <span id="score">0</span> </p> -->
     <div class="arrow-container">
       <button id="up-button" class="arrow-button"></button>
       <div class="left-right-buttons">
@@ -90,6 +92,8 @@
     </div>
   
   </div>
+  <p id="last-roll"><span id="roll"></span> : Last Roll </p>
+
   
 </div>
 

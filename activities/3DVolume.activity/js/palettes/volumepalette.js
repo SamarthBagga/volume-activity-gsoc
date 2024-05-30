@@ -12,19 +12,10 @@ define([
 
     this.setContent([containerElem])
 
-    this.bgSelectedEvent = document.createEvent('CustomEvent')
-    this.bgSelectedEvent.initCustomEvent('volume-selected', true, true, {
-      bg: '',
-    })
-
-    let that = this
-    let backgroundChangeCallback = null
-
     
   }
 
   var addEventListener = function (type, listener, useCapture) {
-    console.log('adding event listener')
     return this.getPalette().addEventListener(type, listener, useCapture)
   }
 

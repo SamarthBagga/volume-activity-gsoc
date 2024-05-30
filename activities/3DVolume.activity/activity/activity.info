@@ -1,6 +1,6 @@
 [Activity]
-name = Volume
+name = 3DVolume
 activity_version = 1
-bundle_id = org.sugarlabs.Volume
+bundle_id = org.sugarlabs.3DVolume
 exec = sugar-activity-web
 icon = activity-icon
