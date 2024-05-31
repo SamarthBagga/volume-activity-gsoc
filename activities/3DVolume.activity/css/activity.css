@@ -129,6 +129,19 @@ body {
   background-repeat: no-repeat;
   background-size: cover;
 }
+#dodeca-button {
+  background-image:url(../icons/dodeca.svg);
+  outline:none;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+#icosa-button {
+  background-image:url(../icons/icosa.svg);
+  outline:none;
+  margin-left: 10px;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
 .active {
   background-color: #e1e1e1 !important; 
 }
