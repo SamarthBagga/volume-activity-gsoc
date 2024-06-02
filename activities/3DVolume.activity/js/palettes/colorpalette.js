@@ -12,17 +12,11 @@ define([
 
     this.setContent([containerElem]);
 
-    // this.colorSelectedEvent = document.createEvent('CustomEvent');
-    // this.colorSelectedEvent.initCustomEvent('color-selected', true, true, { color: '' });
-
     let that = this;
-    // let colorChangeCallback = null;
 
     const colors = document.querySelectorAll(".color");
     colors.forEach((color) => {
       color.addEventListener("click", function () {
-        // presentColor = this.style.backgroundColor;
-        // document.getElementById("color-button").style.backgroundColor = presentColor;
         const selectedColor = this.style.backgroundColor;
         const colorChangeEvent = new CustomEvent("color-selected", {
           detail: { color: selectedColor },
