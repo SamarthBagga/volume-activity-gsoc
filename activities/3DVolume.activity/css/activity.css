@@ -4,6 +4,11 @@
 #main-toolbar #network-button {
 	background-image: url(../lib/sugar-web/graphics/icons/actions/zoom-home.svg);
 }
+.toolbar hr {
+  vertical-align: bottom;
+  margin-bottom: 10px;
+  height: 45px;
+}
 .toolbar {
   display: flex;
   justify-content: space-between;
@@ -50,11 +55,11 @@ body {
   outline: none;
 }
 #volume-button {
-  background-image:url(../icons/cube.svg);
+  background-image:url(../icons/type.svg);
   outline:none;
 }
 #main-toolbar #clear-button {
-  background-image: url(../icons/clear.svg);
+  background-image: url(../icons/minus.svg);
   outline:none;
 }
 #clear-button.active {
@@ -102,6 +107,17 @@ body {
   background-size: contain;
   background-repeat: no-repeat;
   background-image: url(../icons/tess.png);
+  outline:none;
+}
+
+#default-button {
+  margin: 0;
+  padding: 0;
+  height: 65px;
+  width: 65px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-image: url(../icons/type.svg);
   outline:none;
 }
 
@@ -254,7 +270,16 @@ body {
 
 
 
-#color-grid {
+#color-grid-fill {
+  display: grid;
+  grid-template-columns: repeat(3, 50px); /* Decreased circle size */
+  grid-gap: 10px;
+  margin-left:5px;
+  margin-bottom:5px;
+  margin-top:5px;
+  margin-right:5px;
+}
+#color-grid-text {
   display: grid;
   grid-template-columns: repeat(3, 50px); /* Decreased circle size */
   grid-gap: 10px;
@@ -275,6 +300,15 @@ body {
 
 #zoom-out-button {
   background-image: url(../icons/zoom-out.svg);
+  width: 50px;
+  height: 50px;
+  background-color: #000000;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+#zoom-equal-button {
+  background-image: url(../icons/zoom-original.svg);
   width: 50px;
   height: 50px;
   background-color: #000000;
@@ -326,7 +360,16 @@ body {
 }
 
 
-.color {
+.color-fill {
+  width: 45px; /* Decreased circle size */
+  height: 45px; /* Decreased circle size */
+  border-radius: 50%;
+  cursor: pointer;
+  border: white solid 2px;
+}
+
+
+.color-text {
   width: 45px; /* Decreased circle size */
   height: 45px; /* Decreased circle size */
   border-radius: 50%;

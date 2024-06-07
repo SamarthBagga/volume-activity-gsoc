@@ -1,6 +1,6 @@
 define([
   "sugar-web/graphics/palette",
-  "text!activity/palettes/colorpalette.html",
+  "text!activity/palettes/colorpalettefill.html",
 ], function (palette, template) {
   var colorpalette = {};
   colorpalette.ColorPalette = function (invoker, primaryText) {
@@ -14,11 +14,11 @@ define([
 
     let that = this;
 
-    const colors = document.querySelectorAll(".color");
+    const colors = document.querySelectorAll(".color-fill");
     colors.forEach((color) => {
       color.addEventListener("click", function () {
         const selectedColor = this.style.backgroundColor;
-        const colorChangeEvent = new CustomEvent("color-selected", {
+        const colorChangeEvent = new CustomEvent("color-selected-fill", {
           detail: { color: selectedColor },
         });
         document.dispatchEvent(colorChangeEvent);

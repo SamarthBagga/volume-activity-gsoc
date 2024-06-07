@@ -3,7 +3,8 @@ define([
   'sugar-web/env',
   './palettes/bgpalette',
   './palettes/volumepalette',
-  './palettes/colorpalette',
+  './palettes/colorpalettefill',
+  './palettes/colorpalettetext',
   './palettes/zoompalette',
   'sugar-web/graphics/presencepalette',
   'tutorial',
@@ -14,7 +15,8 @@ define([
   env,
   bgpalette,
   volumepalette,
-  colorpalette,
+  colorpaletteFill,
+  colorpaletteText,
   zoompalette,
   presencepalette,
   tutorial,
@@ -48,10 +50,16 @@ define([
       document.getElementById('zoom-button'),
       undefined,
     )
-    var paletteColor = new colorpalette.ColorPalette(
-      document.getElementById('color-button'),
+    var paletteColorFill = new colorpaletteFill.ColorPalette(
+      document.getElementById('color-button-fill'),
       undefined,
     )
+
+    var paletteColorText = new colorpaletteText.ColorPalette(
+      document.getElementById('color-button-text'),
+      undefined,
+    )
+
     let presentScore = 0
     let lastRoll = ''
     let diceArray = []
@@ -62,6 +70,13 @@ define([
     let textColor = '#ffffff'
     var currentenv
     let removeVolume = false
+    let transparent = false
+    let toggleTransparent = false
+    let defaultVolume = true
+
+    var defaultButton = document.getElementById('default-button')
+    defaultButton.classList.toggle('active')
+
     env.getEnvironment(function (err, environment) {
       currentenv = environment
 
@@ -77,8 +92,10 @@ define([
         currentenv.user.colorvalue.stroke != null
           ? currentenv.user.colorvalue.stroke
           : textColor
-      document.getElementById('color-button').style.backgroundColor =
-        presentColor
+
+      document.getElementById('color-button-fill').style.backgroundColor = presentColor
+      document.getElementById('color-button-text').style.backgroundColor = textColor
+
       
 
       if (environment.sharedId) {
@@ -173,18 +190,123 @@ define([
         tutorial.start()
       })
 
-    document.addEventListener('color-selected', function (event) {
-      const selectedColor = event.detail.color
-      // Update the presentColor variable with the selected color
-      presentColor = selectedColor
-      document.getElementById('color-button').style.backgroundColor =
-        presentColor
-      console.log('Present color updated:', presentColor)
-      // changeColors();
-    })
+      document.addEventListener('color-selected-fill', function (event) {
+        const selectedColor = event.detail.color;
+        presentColor = selectedColor;
+        document.getElementById('color-button-fill').style.backgroundColor = presentColor;
+        updateSliders(selectedColor);
+    });
+    
+    const redSliderFill = document.getElementById("red-slider-fill");
+    const greenSliderFill = document.getElementById("green-slider-fill");
+    const blueSliderFill = document.getElementById("blue-slider-fill");
+    
+    let sliderColorFill = { r: 0, g: 0, b: 0 };
+    
+    function rgbToHex(r, g, b) {
+        return (
+            "#" +
+            ((1 << 24) + (r << 16) + (g << 8) + b)
+                .toString(16)
+                .slice(1)
+                .toUpperCase()
+        );
+    }
+    
+    function hexToRgb(hex) {
+        let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result
+            ? {
+                  r: parseInt(result[1], 16),
+                  g: parseInt(result[2], 16),
+                  b: parseInt(result[3], 16),
+              }
+            : null;
+    }
+    
+    function updateColorDisplayFill() {
+        const hexColor = rgbToHex(sliderColorFill.r, sliderColorFill.g, sliderColorFill.b);
+        presentColor = hexColor;
+        document.getElementById('color-button-fill').style.backgroundColor = presentColor;
+    }
+    
+    function updateSlidersFill(color) {
+        const rgb = color.match(/\d+/g).map(num => parseInt(num, 10));
+        redSliderFill.value = rgb[0];
+        greenSliderFill.value = rgb[1];
+        blueSliderFill.value = rgb[2];
+    }
+    
+    function handleSliderChangeFill() {
+        sliderColorText = {
+            r: parseInt(redSliderFill.value),
+            g: parseInt(greenSliderFill.value),
+            b: parseInt(blueSliderFill.value),
+        };
+        updateColorDisplayFill();
+    }
+    
+    redSliderFill.addEventListener("input", handleSliderChangeFill);
+    greenSliderFill.addEventListener("input", handleSliderChangeFill);
+    blueSliderFill.addEventListener("input", handleSliderChangeFill);
 
-    let transparent = false
-    let toggleTransparent = false
+
+    document.addEventListener('color-selected-fill', function (event) {
+      const selectedColorFill = event.detail.color;
+      presentColor = selectedColorFill;
+      document.getElementById('color-button-fill').style.backgroundColor = presentColor;
+      updateSlidersFill(selectedColorFill);
+  });
+
+
+
+
+
+  
+  const redSliderText = document.getElementById("red-slider-text");
+  const greenSliderText = document.getElementById("green-slider-text");
+  const blueSliderText = document.getElementById("blue-slider-text");
+  
+  let sliderColorText = { r: 0, g: 0, b: 0 };
+  
+  
+  function updateColorDisplayText() {
+      const hexColor = rgbToHex(sliderColorText.r, sliderColorText.g, sliderColorText.b);
+      textColor = hexColor;
+      document.getElementById('color-button-text').style.backgroundColor = textColor;
+  }
+  
+  function updateSlidersText(color) {
+      const rgb = color.match(/\d+/g).map(num => parseInt(num, 10));
+      redSliderText.value = rgb[0];
+      greenSliderText.value = rgb[1];
+      blueSliderText.value = rgb[2];
+  }
+  
+  function handleSliderChangeText() {
+      sliderColorText = {
+          r: parseInt(redSliderText.value),
+          g: parseInt(greenSliderText.value),
+          b: parseInt(blueSliderText.value),
+      };
+      updateColorDisplayText();
+  }
+  
+  redSliderText.addEventListener("input", handleSliderChangeText);
+  greenSliderText.addEventListener("input", handleSliderChangeText);
+  blueSliderText.addEventListener("input", handleSliderChangeText);
+
+  document.addEventListener('color-selected-text', function (event) {
+    const selectedColorText = event.detail.color;
+    textColor = selectedColorText;
+    document.getElementById('color-button-text').style.backgroundColor = textColor;
+    updateSlidersText(selectedColorFill);
+});
+  
+
+    
+
+
     function updateDice(type, value) {
       dices[type] += value
       document.getElementById(type).innerHTML = '<br />' + dices[type]
@@ -219,6 +341,11 @@ define([
       var numberButton = document.getElementById('number-button')
       numberButton.classList.toggle('active')
       document.getElementById("volume-button").style.backgroundImage = 'url(icons/number_on.svg)'
+      if (defaultVolume) {
+        var defaultButton = document.getElementById('default-button')
+        defaultButton.classList.toggle('active')
+        defaultVolume = !defaultVolume
+      }
       if (toggleTransparent) {
         var transparentButton = document.getElementById('transparent-button')
         transparentButton.classList.toggle('active')
@@ -232,6 +359,65 @@ define([
       showNumbers = !showNumbers
       // toggleNumbers();
     })
+
+    document
+      .querySelector('#transparent-button')
+      .addEventListener('click', () => {
+        var transparentButton = document.getElementById('transparent-button')
+        // Toggle the 'active' class on the clear button
+        transparentButton.classList.toggle('active')
+        document.getElementById("volume-button").style.backgroundImage = 'url(icons/tess.png)'
+        console.log("it is beign clicked now!!")
+        console.log(defaultVolume)
+
+        if (defaultVolume) {
+          console.log("it is true")
+          var defaultButton = document.getElementById('default-button')
+          defaultButton.classList.toggle('active')
+          defaultVolume = !defaultVolume
+        }
+
+        if (showNumbers) {
+          var numberButton = document.getElementById('number-button')
+          numberButton.classList.toggle('active')
+          showNumbers = !showNumbers
+        }
+        if (showImage) {
+          var imageButton1 = document.getElementById('image-button')
+          imageButton1.classList.toggle('active')
+          showImage = !showImage
+        }
+        toggleTransparent = !toggleTransparent
+      })
+
+      document
+      .querySelector('#default-button')
+      .addEventListener('click', () => {
+        var defaultButton = document.getElementById('default-button')
+        // Toggle the 'active' class on the clear button
+        defaultButton.classList.toggle('active')
+        document.getElementById("volume-button").style.backgroundImage = 'url(icons/type.svg)'
+
+        if (toggleTransparent) {
+          var transparentButton = document.getElementById('transparent-button')
+          transparentButton.classList.toggle('active')
+          toggleTransparent = !toggleTransparent
+        }
+
+        if (showNumbers) {
+          var numberButton = document.getElementById('number-button')
+          numberButton.classList.toggle('active')
+          showNumbers = !showNumbers
+        }
+        if (showImage) {
+          var imageButton1 = document.getElementById('image-button')
+          imageButton1.classList.toggle('active')
+          showImage = !showImage
+        }
+        defaultVolume = !defaultVolume
+      })
+
+
     document.querySelector('#clear-button').addEventListener('click', () => {
       var clearButton = document.getElementById('clear-button')
       // Toggle the 'active' class on the clear button
@@ -251,26 +437,6 @@ define([
 
     })
     const remove_button = document.querySelector('#clear-button')
-    document
-      .querySelector('#transparent-button')
-      .addEventListener('click', () => {
-        var transparentButton = document.getElementById('transparent-button')
-        // Toggle the 'active' class on the clear button
-        transparentButton.classList.toggle('active')
-        document.getElementById("volume-button").style.backgroundImage = 'url(icons/tess.png)'
-
-        if (showNumbers) {
-          var numberButton = document.getElementById('number-button')
-          numberButton.classList.toggle('active')
-          showNumbers = !showNumbers
-        }
-        if (showImage) {
-          var imageButton1 = document.getElementById('image-button')
-          imageButton1.classList.toggle('active')
-          showImage = !showImage
-        }
-        toggleTransparent = !toggleTransparent
-      })
 
     let addCube = false
     let addTetra = false
@@ -540,7 +706,7 @@ define([
     // Function to update the elements
     function updateElements() {
       // totalScoreElement.textContent = presentScore
-      lastRollElement.textContent = lastRoll + '=' + presentScore;
+      lastRollElement.textContent = lastRoll.substring(0, lastRoll.length - 2) + '= ' + presentScore;
     }
 
     const renderer = new THREE.WebGLRenderer({
@@ -570,7 +736,6 @@ define([
         for (let i = 0; i < intersects.length; i++) {
           var intersectedObject = intersects[i]?.object
           if (intersectedObject.geometry.type == 'PlaneGeometry') {
-            console.log(intersects[i].point)
             xCoordinate = intersects[i].point.x
             zCoordinate = intersects[i].point.z
 
@@ -891,6 +1056,10 @@ define([
 
     const zoomInButton = document.getElementById('zoom-in-button')
     const zoomOutButton = document.getElementById('zoom-out-button')
+    const zoomEqualButton = document.getElementById('zoom-equal-button')
+
+    
+
 
     const zoomInFunction = e => {
       const fov = getFov()
@@ -901,6 +1070,12 @@ define([
     const zoomOutFunction = e => {
       const fov = getFov()
       camera.fov = clickZoom(fov, 'zoomOut')
+      camera.updateProjectionMatrix()
+    }
+
+    const zoomEqualFunction = e => {
+      const fov = getFov()
+      camera.fov = 45;
       camera.updateProjectionMatrix()
     }
 
@@ -923,8 +1098,11 @@ define([
       )
     }
 
+
+
     zoomInButton.addEventListener('click', zoomInFunction)
     zoomOutButton.addEventListener('click', zoomOutFunction)
+    zoomEqualButton.addEventListener('click', zoomEqualFunction);
 
     function createTetrahedron(
       sharedColor,
@@ -1338,6 +1516,7 @@ define([
         })
         const line = new THREE.LineSegments(wireframe, lineMaterial)
         boxMesh = line
+
       } else if (tempImage) {
         const boxGeo = new THREE.BoxGeometry(2, 2, 2)
 
@@ -1884,7 +2063,7 @@ const icosahedronShape = new CANNON.ConvexPolyhedron({
         //   break
         // }
       }
-      lastRoll += faceVectors[minInd].face + ' +'
+      lastRoll += faceVectors[minInd].face + ' + '
       presentScore += faceVectors[minInd].face
       updateElements()
     }
@@ -1919,7 +2098,7 @@ const icosahedronShape = new CANNON.ConvexPolyhedron({
         faceVector.vector.applyEuler(body.rotation)
 
         if (Math.round(faceVector.vector.y) == 1) {
-          lastRoll += faceVector.face + ' +'
+          lastRoll += faceVector.face + ' + '
           presentScore += faceVector.face
           updateElements()
           break
@@ -1950,7 +2129,7 @@ const icosahedronShape = new CANNON.ConvexPolyhedron({
         faceVector.vector.applyEuler(body.rotation)
         console.log(faceVector.vector.y)
         if (Math.round(faceVector.vector.y) == 1) {
-          lastRoll += faceVector.face + ' +'
+          lastRoll += faceVector.face + ' + '
           presentScore += faceVector.face
           updateElements()
           break
