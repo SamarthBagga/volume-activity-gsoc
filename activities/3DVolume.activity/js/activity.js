@@ -85,7 +85,7 @@ define([
           ? currentenv.user.colorvalue.fill
           : presentColor
         
-      scene.background = new THREE.Color("#909090")
+      scene.background = new THREE.Color("#595959")
       console.log(presentColor)
 
       
@@ -949,7 +949,7 @@ define([
     const groundMesh = new THREE.Mesh(groundGeo, groundMat)
     groundMesh.receiveShadow = true
 
-    groundMesh.material.color.setHex(0xAEAEAE)
+    groundMesh.material.color.setHex(0x909090)
     scene.add(groundMesh)
     const groundPhysMat = new CANNON.Material()
     const groundWidth = 0 // Desired width of the ground
@@ -1550,6 +1550,9 @@ define([
       boxMesh.castShadow = true
       scene.add(boxMesh)
 
+      const boxPhysmat = new CANNON.Material()
+
+
       let x = xCoordinateShared == null ? xCoordinate : xCoordinateShared
       let z = zCoordinateShared == null ? zCoordinate : zCoordinateShared
       const boxBody = new CANNON.Body({
@@ -1580,7 +1583,6 @@ define([
       boxBody.applyImpulse(offset, rollingForce)
 
       // what will happen when the two bodies touch
-      const boxPhysmat = new CANNON.Material()
 
       const groundBoxContactMat = new CANNON.ContactMaterial(
         groundPhysMat,
