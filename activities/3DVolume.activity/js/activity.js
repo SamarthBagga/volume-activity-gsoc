@@ -85,7 +85,8 @@ define([
           ? currentenv.user.colorvalue.fill
           : presentColor
         
-      scene.background = new THREE.Color(presentColor)
+      scene.background = new THREE.Color("#909090")
+      console.log(presentColor)
 
       
       textColor =
@@ -948,7 +949,7 @@ define([
     const groundMesh = new THREE.Mesh(groundGeo, groundMat)
     groundMesh.receiveShadow = true
 
-    groundMesh.material.color.setHex(0x425eff)
+    groundMesh.material.color.setHex(0xAEAEAE)
     scene.add(groundMesh)
     const groundPhysMat = new CANNON.Material()
     const groundWidth = 0 // Desired width of the ground
@@ -1057,6 +1058,7 @@ define([
     const zoomInButton = document.getElementById('zoom-in-button')
     const zoomOutButton = document.getElementById('zoom-out-button')
     const zoomEqualButton = document.getElementById('zoom-equal-button')
+    const zoomToButton = document.getElementById('zoom-to-button')
 
     
 
@@ -1076,6 +1078,12 @@ define([
     const zoomEqualFunction = e => {
       const fov = getFov()
       camera.fov = 45;
+      camera.updateProjectionMatrix()
+    }
+
+    const zoomToFunction = e => {
+      const fov = getFov()
+      camera.fov = 35;
       camera.updateProjectionMatrix()
     }
 
@@ -1103,6 +1111,9 @@ define([
     zoomInButton.addEventListener('click', zoomInFunction)
     zoomOutButton.addEventListener('click', zoomOutFunction)
     zoomEqualButton.addEventListener('click', zoomEqualFunction);
+    zoomToButton.addEventListener('click', zoomToFunction);
+
+
 
     function createTetrahedron(
       sharedColor,
@@ -1539,7 +1550,6 @@ define([
       boxMesh.castShadow = true
       scene.add(boxMesh)
 
-      const boxPhysmat = new CANNON.Material()
       let x = xCoordinateShared == null ? xCoordinate : xCoordinateShared
       let z = zCoordinateShared == null ? zCoordinate : zCoordinateShared
       const boxBody = new CANNON.Body({
@@ -1570,6 +1580,8 @@ define([
       boxBody.applyImpulse(offset, rollingForce)
 
       // what will happen when the two bodies touch
+      const boxPhysmat = new CANNON.Material()
+
       const groundBoxContactMat = new CANNON.ContactMaterial(
         groundPhysMat,
         boxPhysmat,
@@ -1583,6 +1595,10 @@ define([
     const cannonDebugger = new CannonDebugger(scene, world, {
       color: 0xadd8e6,
     })
+
+
+
+
     function createDodecahedron(
       sharedColor,
       ifNumbers,
@@ -1592,7 +1608,6 @@ define([
       ifImage,
       sharedImageData
     ) {
-      console.log("creating a dodecahedron")
       let dodecahedron
       let tempShowNumbers = ifNumbers == null ? showNumbers : ifNumbers
       let tempTransparent =
@@ -1601,7 +1616,7 @@ define([
       if (tempShowNumbers) {
         let tileDimension = new THREE.Vector2(4, 5)
         let tileSize = 512
-        let g = new THREE.DodecahedronGeometry(2)
+        let g = new THREE.DodecahedronGeometry(1.75)
 
         let c = document.createElement('canvas')
         let div = document.createElement('div')
@@ -1614,54 +1629,45 @@ define([
         let uvs = []
 
         let baseUVs = [
-          [0.067, 0.25],
-          [0.933, 0.25],
-          [0.5, 1],
+          [0.35, 0.8],  // Top (closer to center)
+  [0.75, 0.7],   // Top right (more space)
+  [0.9, 0.2],   // Bottom right (more space for text)
+  [0.5, 0.1],   // Bottom center (slightly inwards)
+  [0.2, 0.2],   // Bottom left (more space for text)
+        
         ].map(p => {
           return new THREE.Vector2(...p)
         })
-        let arrOfNums = [
-          [2, 1, 3],
-          [1, 2, 4],
-          [3, 1, 4],
-          [2, 3, 4],
-        ]
-        for (let i = 0; i < 4; i++) {
-          let u = i % tileDimension.x
-          let v = Math.floor(i / tileDimension.x)
-          uvs.push(
-            (baseUVs[0].x + u) / tileDimension.x,
-            (baseUVs[0].y + v) / tileDimension.y,
-            (baseUVs[1].x + u) / tileDimension.x,
-            (baseUVs[1].y + v) / tileDimension.y,
-            (baseUVs[2].x + u) / tileDimension.x,
-            (baseUVs[2].y + v) / tileDimension.y,
-          )
+        
+        for (let i = 0; i < 12; i++) {
+          let u = i % tileDimension.x;
+  let v = Math.floor(i / tileDimension.x);
+
+  // Calculate offset based on face position in the texture grid
+  let offsetU = u / tileDimension.x;
+  let offsetV = v / tileDimension.y;
+
+  // Define UVs for each face vertex using baseUVs and offset
+  uvs.push(
+    baseUVs[0].x + offsetU, baseUVs[0].y + offsetV,
+    baseUVs[1].x + offsetU, baseUVs[1].y + offsetV,
+    baseUVs[2].x + offsetU, baseUVs[2].y + offsetV,
+    baseUVs[3].x + offsetU, baseUVs[3].y + offsetV,
+    baseUVs[4].x + offsetU, baseUVs[4].y + offsetV
+  );
 
           ctx.textAlign = 'center'
           ctx.textBaseline = 'middle'
           ctx.font = `bold 150px Arial`
-          ctx.fillStyle = textColor
-          // ctx.fillText(
-          //   i + 1,
-          //   (u + 0.5) * tileSize,
-          //   c.height - (v + 0.5) * tileSize
-          // );
+          ctx.fillStyle = textColor;
           let aStep = (Math.PI * 2) / 3
           let yAlign = Math.PI * 0.5
           let tileQuarter = tileSize * 0.25
-          for (let j = 0; j < 3; j++) {
-            ctx.save()
-            ctx.translate(
-              (u + 0.5) * tileSize + Math.cos(j * aStep - yAlign) * tileQuarter,
-              c.height -
-                (v + 0.5) * tileSize +
-                Math.sin(j * aStep - yAlign) * tileQuarter,
-            )
-            ctx.rotate((j * Math.PI * 2) / 3)
-            ctx.fillText(arrOfNums[i][j], 0, 0)
-            ctx.restore()
-          }
+          ctx.fillText(
+            i + 1,
+            (u + 0.5) * tileSize,
+            c.height - (v + 0.5) * tileSize,
+          )
         }
         g.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2))
 
@@ -1674,7 +1680,7 @@ define([
 
         dodecahedron = new THREE.Mesh(g, m)
       } else if (tempTransparent) {
-        const dodecahedronTransparentGeometry = new THREE.DodecahedronGeometry(2) // Size of the dodecahedron   
+        const dodecahedronTransparentGeometry = new THREE.DodecahedronGeometry(1.75) // Size of the dodecahedron   
         const wireframe = new THREE.WireframeGeometry(
           dodecahedronTransparentGeometry,
         )
@@ -1698,7 +1704,7 @@ define([
         // Create cube mesh with the material
         dodecahedron = new THREE.Mesh(boxGeo, material)
       } else {
-        const dodecahedronGeometry = new THREE.DodecahedronGeometry(2) // Size of the dodecahedron
+        const dodecahedronGeometry = new THREE.DodecahedronGeometry(1.75) // Size of the dodecahedron
 
         const tetraMaterial = new THREE.MeshStandardMaterial({
           color: sharedColor != null ? sharedColor : presentColor,
@@ -1755,12 +1761,23 @@ const dodecahedronShape = new CANNON.ConvexPolyhedron({
       let z = zCoordinateShared == null ? zCoordinate : zCoordinateShared
 
       const dodecahedronBody = new CANNON.Body({
-        mass: 2, // Set mass
+        mass: 1, // Set mass
         shape: dodecahedronShape,
         position: new CANNON.Vec3(x, 10, z),
         friction: -1,
         restitution: 5,
       })
+
+      const dodecaPhysmat = new CANNON.Material()
+
+
+      const groundDodecaContactMat = new CANNON.ContactMaterial(
+        groundPhysMat,
+        dodecaPhysmat,
+        { friction: 0.5 },
+      )
+
+      world.addContactMaterial(groundDodecaContactMat)
       if (tempShowNumbers) {
         dodecahedronBody.addEventListener('sleep', () => {
           sleepCounter++;
@@ -1790,8 +1807,7 @@ const dodecahedronShape = new CANNON.ConvexPolyhedron({
     ) {
       let icosahedron
       let tempShowNumbers = ifNumbers == null ? showNumbers : ifNumbers
-      let tempTransparent =
-        ifTransparent == null ? toggleTransparent : ifTransparent
+      let tempTransparent = ifTransparent == null ? toggleTransparent : ifTransparent
       let tempImage = ifImage == null ? showImage : ifImage
       if (tempShowNumbers) {
         let tileDimension = new THREE.Vector2(4, 5)
@@ -1821,7 +1837,7 @@ const dodecahedronShape = new CANNON.ConvexPolyhedron({
           [3, 1, 4],
           [2, 3, 4],
         ]
-        for (let i = 0; i < 4; i++) {
+        for (let i = 0; i < 20; i++) {
           let u = i % tileDimension.x
           let v = Math.floor(i / tileDimension.x)
           uvs.push(
@@ -1835,7 +1851,7 @@ const dodecahedronShape = new CANNON.ConvexPolyhedron({
 
           ctx.textAlign = 'center'
           ctx.textBaseline = 'middle'
-          ctx.font = `bold 150px Arial`
+          ctx.font = `bold 175px Arial`
           ctx.fillStyle = textColor
           // ctx.fillText(
           //   i + 1,
@@ -1845,18 +1861,11 @@ const dodecahedronShape = new CANNON.ConvexPolyhedron({
           let aStep = (Math.PI * 2) / 3
           let yAlign = Math.PI * 0.5
           let tileQuarter = tileSize * 0.25
-          for (let j = 0; j < 3; j++) {
-            ctx.save()
-            ctx.translate(
-              (u + 0.5) * tileSize + Math.cos(j * aStep - yAlign) * tileQuarter,
-              c.height -
-                (v + 0.5) * tileSize +
-                Math.sin(j * aStep - yAlign) * tileQuarter,
-            )
-            ctx.rotate((j * Math.PI * 2) / 3)
-            ctx.fillText(arrOfNums[i][j], 0, 0)
-            ctx.restore()
-          }
+          ctx.fillText(
+            i + 1,
+            (u + 0.5) * tileSize,
+            c.height - (v + 0.5) * tileSize,
+          )
         }
         g.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2))
 
@@ -1902,7 +1911,6 @@ const dodecahedronShape = new CANNON.ConvexPolyhedron({
 
         icosahedron = new THREE.Mesh(icosahedronGeometry, tetraMaterial)
       }
-
       icosahedron.rotation.set(Math.PI / 4, Math.PI / 4, 0) // Rotates 90 degrees on X, 45 degrees on Y
       icosahedron.castShadow = true
       scene.add(icosahedron)
@@ -2127,7 +2135,6 @@ const icosahedronShape = new CANNON.ConvexPolyhedron({
 
       for (const faceVector of faceVectors) {
         faceVector.vector.applyEuler(body.rotation)
-        console.log(faceVector.vector.y)
         if (Math.round(faceVector.vector.y) == 1) {
           lastRoll += faceVector.face + ' + '
           presentScore += faceVector.face
@@ -2190,7 +2197,8 @@ const icosahedronShape = new CANNON.ConvexPolyhedron({
           break
         case 'default':
           groundMesh.material.needsUpdate = true
-          groundMesh.material.color.setHex(0x425eff)
+          groundMesh.material.color.setHex(0xD3D3D3)
+          console.log(groundMesh.material.color)
           groundMesh.material.wireframe = false
           groundMesh.material.map = null
           groundBody.material.friction = 1
@@ -2201,7 +2209,7 @@ const icosahedronShape = new CANNON.ConvexPolyhedron({
 
     function animate() {
       world.step(timeStep)
-      // cannonDebugger.update();
+      cannonDebugger.update();
 
       groundMesh.position.copy(groundBody.position)
       groundMesh.quaternion.copy(groundBody.quaternion)

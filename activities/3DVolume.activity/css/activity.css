@@ -316,6 +316,15 @@ body {
   background-repeat: no-repeat;
 }
 
+#zoom-to-button {
+  background-image: url(../icons/zoom-to-width.svg);
+  width: 50px;
+  height: 50px;
+  background-color: #000000;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
 #right-button {
   background-image: url(../icons/right-arrow.svg);
 }
