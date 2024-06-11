@@ -8,6 +8,7 @@ define([
     this.getPalette().id = "color-palette";
 
     var containerElem = document.createElement("div");
+    
     containerElem.innerHTML = template;
 
     this.setContent([containerElem]);

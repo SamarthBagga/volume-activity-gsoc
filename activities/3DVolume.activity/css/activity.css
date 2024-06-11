@@ -63,7 +63,7 @@ body {
   outline:none;
 }
 #clear-button.active {
-  background-color: #e1e1e1; /* Light white color */
+  background-color: #D3D3D3; 
 }
 
 
@@ -80,9 +80,10 @@ body {
   width: 65px;
   background-size: cover;
   background-repeat: no-repeat;
-  background-image: url(../icons/number_on.svg);
-  outline:none;
+  background-image: url(../icons/number_volume.svg);
+  border-radius: 5px;
 }
+
 #zoom-button {
   height: 45px;
   width: 45xpx;
@@ -106,8 +107,8 @@ body {
   width: 65px;
   background-size: contain;
   background-repeat: no-repeat;
-  background-image: url(../icons/tess.png);
-  outline:none;
+  background-image: url(../icons/transparent_volume.svg);
+  border-radius: 5px;
 }
 
 #default-button {
@@ -117,8 +118,9 @@ body {
   width: 65px;
   background-size: contain;
   background-repeat: no-repeat;
-  background-image: url(../icons/type.svg);
+  background-image: url(../icons/default_volume.svg);
   outline:none;
+  border-radius: 5px;
 }
 
 #colors-button-fill{
@@ -151,6 +153,12 @@ body {
   background-repeat: no-repeat;
   background-size: cover;
 }
+#deca-button {
+  background-image:url(../icons/deca.svg);
+  outline:none;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
 #icosa-button {
   background-image:url(../icons/icosa.svg);
   outline:none;
@@ -159,7 +167,7 @@ body {
   background-size: cover;
 }
 .active {
-  background-color: #e1e1e1 !important; 
+  background-color: #656565 !important; 
 }
 
 #main-toolbar #help-button {
@@ -268,11 +276,17 @@ body {
 }
 
 
+.color-palette {
+  display: flex;
+  width: 370px; /* ugly hack */
+  background-color: #000000;
+  border: #808080 2px solid;
+}
 
 
 #color-grid-fill {
   display: grid;
-  grid-template-columns: repeat(3, 50px); /* Decreased circle size */
+  grid-template-columns: repeat(3, 50px); 
   grid-gap: 10px;
   margin-left:5px;
   margin-bottom:5px;
@@ -281,7 +295,7 @@ body {
 }
 #color-grid-text {
   display: grid;
-  grid-template-columns: repeat(3, 50px); /* Decreased circle size */
+  grid-template-columns: repeat(3, 50px);
   grid-gap: 10px;
   margin-left:5px;
   margin-bottom:5px;
