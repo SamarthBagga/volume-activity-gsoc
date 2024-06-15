@@ -109,7 +109,6 @@ define([
 
     var onNetworkDataReceived = function (msg) {
       if (presence.getUserInfo().networkId === msg.user.networkId) {
-        console.log('returbign')
         return
       }
       if (msg.action == 'throw') {
@@ -352,7 +351,7 @@ define([
     document.querySelector('#number-button').addEventListener('click', () => {
       var numberButton = document.getElementById('number-button')
       numberButton.classList.toggle('active')
-      document.getElementById("volume-button").style.backgroundImage = 'url(icons/number_on.svg)'
+      document.getElementById("volume-button").style.backgroundImage = 'url(icons/number_volume.svg)'
       if (defaultVolume) {
         var defaultButton = document.getElementById('default-button')
         defaultButton.classList.toggle('active')
@@ -378,7 +377,7 @@ define([
         var transparentButton = document.getElementById('transparent-button')
         // Toggle the 'active' class on the clear button
         transparentButton.classList.toggle('active')
-        document.getElementById("volume-button").style.backgroundImage = 'url(icons/tess.png)'
+        document.getElementById("volume-button").style.backgroundImage = 'url(icons/transparent_volume.svg)'
         console.log("it is beign clicked now!!")
         console.log(defaultVolume)
 
@@ -408,7 +407,7 @@ define([
         var defaultButton = document.getElementById('default-button')
         // Toggle the 'active' class on the clear button
         defaultButton.classList.toggle('active')
-        document.getElementById("volume-button").style.backgroundImage = 'url(icons/type.svg)'
+        document.getElementById("volume-button").style.backgroundImage = 'url(icons/cube_solid.svg)'
 
         if (toggleTransparent) {
           var transparentButton = document.getElementById('transparent-button')
@@ -430,75 +429,70 @@ define([
       })
 
 
-    document.querySelector('#clear-button').addEventListener('click', () => {
-      var clearButton = document.getElementById('clear-button')
-      // Toggle the 'active' class on the clear button
-      clearButton.classList.toggle('active')
-      removeVolume = !removeVolume
-      addCube = false
-      addTetra = false
-      addOcta = false
-      addDodeca = false
-      addDeca = false
-      addIcosa = false
-      cube.classList.remove('active')
-      tetra.classList.remove('active')
-      octa.classList.remove('active')
-      dodeca.classList.remove('active')
-      icosa.classList.remove('active')
-      deca.classList.remove('active')
 
-
-
-    })
-
-    
-    const remove_button = document.querySelector('#clear-button')
-
-    remove_button.addEventListener('click', function () {
-      if (!remove_button.classList.contains('active')) {
-        addCube = false
-        addTetra = false
-        addOcta = false
-        addDodeca = false
-        addDeca = false
-        addIcosa = false
-        removeVolume = true
-        octa.classList.remove('active')
-        cube.classList.remove('active')
-        tetra.classList.remove('active')
-        dodeca.classList.remove('active')
-        deca.classList.remove('active')
-        icosa.classList.remove('active')
-        remove_button.classList.add('active')
-
+      let addShape = {
+        cube: false,
+        tetra: false,
+        octa: false,
+        dodeca: false,
+        deca: false,
+        icosa: false
+      };
+      
+      const buttons = ['cube', 'tetra', 'octa', 'dodeca', 'deca', 'icosa'];
+      const clearButton = document.getElementById('clear-button');
+      const removeButton = document.querySelector('#clear-button');
+      const solidButton = document.querySelector('#solid-button');
+      
+      const toggleShape = (shape) => {
+        buttons.forEach(btn => {
+          addShape[btn] = btn === shape;
+          document.getElementById(`${btn}-button`).classList.toggle('active', btn === shape);
+        });
+        removeVolume = false;
+        removeButton.classList.remove('active');
+      
         if (transparent) {
-          transparent = false
-          document.querySelector('#solid-button').style.backgroundImage =
-            'url(icons/cube_solid.svg)'
-          toggleTransparency()
+          transparent = false;
+          solidButton.style.backgroundImage = 'url(icons/cube_solid.svg)';
+          toggleTransparency();
         }
-      } 
-      // else {
-      //   icosa.classList.remove('active')
-      //   addIcosa = !addIcosa
-      // }
-    })
-
-    let addCube = false
-    let addTetra = false
-    let addOcta = false
-    let addDodeca = false
-    let addDeca = false
-    let addIcosa = false
-    var cube = document.getElementById('cube-button')
-    var tetra = document.getElementById('tetra-button')
-    var octa = document.getElementById('octa-button')
-    var dodeca = document.getElementById('dodeca-button')
-    var icosa = document.getElementById('icosa-button')
-    var deca = document.getElementById('deca-button')
-
-
+      };
+      
+      clearButton.addEventListener('click', () => {
+        clearButton.classList.toggle('active');
+        removeVolume = !removeVolume;
+        buttons.forEach(btn => {
+          addShape[btn] = false;
+          document.getElementById(`${btn}-button`).classList.remove('active');
+        });
+      });
+      
+      removeButton.addEventListener('click', () => {
+        if (!removeButton.classList.contains('active')) {
+          buttons.forEach(btn => {
+            addShape[btn] = false;
+            document.getElementById(`${btn}-button`).classList.remove('active');
+          });
+          removeVolume = true;
+          removeButton.classList.add('active');
+      
+          if (transparent) {
+            transparent = false;
+            solidButton.style.backgroundImage = 'url(icons/cube_solid.svg)';
+            toggleTransparency();
+          }
+        }
+      });
+      
+      buttons.forEach(shape => {
+        document.getElementById(`${shape}-button`).addEventListener('click', () => {
+          if (!document.getElementById(`${shape}-button`).classList.contains('active')) {
+            toggleShape(shape);
+          }
+        });
+      });
+      
 
 
     // const imageButton = document.getElementById('image-button')
@@ -554,194 +548,6 @@ define([
     //       { mimetype: 'image/jpeg' },
     //     )
     //   })
-
-    // Add click event listeners to each div
-    cube.addEventListener('click', function () {
-      if (!cube.classList.contains('active')) {
-        cube.classList.add('active')
-        addCube = true
-        addTetra = false
-        addOcta = false
-        addDodeca = false
-        addDeca = false
-        addIcosa = false
-        removeVolume = false
-        remove_button.classList.remove('active')
-        tetra.classList.remove('active')
-        octa.classList.remove('active')
-        dodeca.classList.remove('active')
-        icosa.classList.remove('active')
-        deca.classList.remove('active')
-
-
-
-        if (transparent) {
-          transparent = false
-          document.querySelector('#solid-button').style.backgroundImage =
-            'url(icons/cube_solid.svg)'
-          toggleTransparency()
-        }
-      } 
-      // else {
-      //   cube.classList.remove('active')
-      //   addCube = !addCube
-      // }
-    })
-    
-    tetra.addEventListener('click', function () {
-      if (!tetra.classList.contains('active')) {
-        addCube = false
-        addTetra = true
-        addOcta = false
-        addDodeca = false
-        addDeca = false
-        addIcosa = false
-        tetra.classList.add('active')
-        cube.classList.remove('active')
-        octa.classList.remove('active')
-        dodeca.classList.remove('active')
-        icosa.classList.remove('active')
-        deca.classList.remove('active')
-
-
-
-        removeVolume = false
-        remove_button.classList.remove('active')
-        if (transparent) {
-          transparent = false
-          document.querySelector('#solid-button').style.backgroundImage =
-            'url(icons/cube_solid.svg)'
-          toggleTransparency()
-        }
-      } 
-      // else {
-      //   tetra.classList.remove('active')
-      //   addTetra = !addTetra
-      // }
-    })
-
-    octa.addEventListener('click', function () {
-      if (!octa.classList.contains('active')) {
-        addCube = false
-        addTetra = false
-        addOcta = true
-        addDodeca = false
-        addDeca = false
-        addIcosa = false
-        octa.classList.add('active')
-        cube.classList.remove('active')
-        tetra.classList.remove('active')
-        icosa.classList.remove('active')
-        dodeca.classList.remove('active')
-        deca.classList.remove('active')
-
-
-        removeVolume = false
-        remove_button.classList.remove('active')
-        if (transparent) {
-          transparent = false
-          document.querySelector('#solid-button').style.backgroundImage =
-            'url(icons/cube_solid.svg)'
-          toggleTransparency()
-        }
-      } 
-      // else {
-      //   octa.classList.remove('active')
-      //   addOcta = !addOcta
-      // }
-    })
-
-    deca.addEventListener('click', function () {
-      if (!deca.classList.contains('active')) {
-        addCube = false
-        addTetra = false
-        addOcta = false
-        addIcosa = false
-        addDodeca = false
-        addDeca = true
-        octa.classList.remove('active')
-        cube.classList.remove('active')
-        tetra.classList.remove('active')
-        icosa.classList.remove('active')
-        dodeca.classList.remove('active')
-        deca.classList.add('active')
-
-        removeVolume = false
-        remove_button.classList.remove('active')
-        if (transparent) {
-          transparent = false
-          document.querySelector('#solid-button').style.backgroundImage =
-            'url(icons/cube_solid.svg)'
-          toggleTransparency()
-        }
-      } 
-      // else {
-      //   deca.classList.remove('active')
-      //   addDeca = !addDeca
-      // }
-    })
-
-    dodeca.addEventListener('click', function () {
-      if (!dodeca.classList.contains('active')) {
-        addCube = false
-        addTetra = false
-        addOcta = false
-        addIcosa = false
-        addDeca = false
-        addDodeca = true
-        octa.classList.remove('active')
-        cube.classList.remove('active')
-        tetra.classList.remove('active')
-        icosa.classList.remove('active')
-        deca.classList.remove('active')
-        dodeca.classList.add('active')
-
-        removeVolume = false
-        remove_button.classList.remove('active')
-        if (transparent) {
-          transparent = false
-          document.querySelector('#solid-button').style.backgroundImage =
-            'url(icons/cube_solid.svg)'
-          toggleTransparency()
-        }
-      } 
-      // else {
-      //   dodeca.classList.remove('active')
-      //   addDodeca = !addDodeca
-      // }
-    })
-
-    icosa.addEventListener('click', function () {
-      if (!icosa.classList.contains('active')) {
-        addCube = false
-        addTetra = false
-        addOcta = false
-        addDodeca = false
-        addDeca = false
-        addIcosa = true
-        octa.classList.remove('active')
-        cube.classList.remove('active')
-        tetra.classList.remove('active')
-        dodeca.classList.remove('active')
-        deca.classList.remove('active')
-
-
-        icosa.classList.add('active')
-
-        removeVolume = false
-        remove_button.classList.remove('active')
-        if (transparent) {
-          transparent = false
-          document.querySelector('#solid-button').style.backgroundImage =
-            'url(icons/cube_solid.svg)'
-          toggleTransparency()
-        }
-      } 
-      // else {
-      //   icosa.classList.remove('active')
-      //   addIcosa = !addIcosa
-      // }
-    })
 
     // Event listeners
     // document
@@ -820,7 +626,7 @@ define([
     document.querySelector('body').addEventListener('click', onAddClick)
 
     function onAddClick(event) {
-      if (addCube || addTetra || addOcta || addDodeca || addIcosa || addDeca) {
+      if (!removeVolume) {
         var rect = renderer.domElement.getBoundingClientRect()
         mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
         mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
@@ -837,7 +643,7 @@ define([
             xCoordinate = intersects[i].point.x
             zCoordinate = intersects[i].point.z
 
-            if (addCube) {
+            if (addShape['cube']) {
               createCube()
               if (presence) {
                 presence.sendMessage(presence.getSharedInfo().id, {
@@ -854,7 +660,7 @@ define([
                   },
                 })
               }
-            } else if (addTetra) {
+            } else if (addShape['tetra']) {
               createTetrahedron()
               if (presence) {
                 presence.sendMessage(presence.getSharedInfo().id, {
@@ -871,7 +677,7 @@ define([
                   },
                 })
               }
-            } else if (addDeca) {
+            } else if (addShape['deca']) {
               createDecahedron()
               if (presence) {
                 presence.sendMessage(presence.getSharedInfo().id, {
@@ -888,7 +694,7 @@ define([
                   },
                 })
               }
-          } else if (addDodeca) {
+          } else if (addShape['dodeca']) {
               createDodecahedron()
               if (presence) {
                 presence.sendMessage(presence.getSharedInfo().id, {
@@ -905,7 +711,7 @@ define([
                   },
                 })
               }
-            } else if (addIcosa) {
+            } else if (addShape['icosa']) {
               createIcosahedron()
               if (presence) {
                 presence.sendMessage(presence.getSharedInfo().id, {
@@ -924,7 +730,7 @@ define([
               }
             } else {
               createOctahedron()
-              if (presence) {
+              if (addShape['octa']) {
                 console.log(showImage);
                 presence.sendMessage(presence.getSharedInfo().id, {
                   user: presence.getUserInfo(),
@@ -1193,7 +999,7 @@ define([
 
     const zoomEqualFunction = e => {
       const fov = getFov()
-      camera.fov = 45;
+      camera.fov = 29;
       camera.updateProjectionMatrix()
     }
 

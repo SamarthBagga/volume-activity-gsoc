@@ -55,7 +55,7 @@ body {
   outline: none;
 }
 #volume-button {
-  background-image:url(../icons/type.svg);
+  background-image:url(../icons/cube_solid.svg);
   outline:none;
 }
 #main-toolbar #clear-button {
@@ -301,6 +301,12 @@ body {
   margin-bottom:5px;
   margin-top:5px;
   margin-right:5px;
+}
+
+.slider-container {
+  display: flex;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 #zoom-in-button {
