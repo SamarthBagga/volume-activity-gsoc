@@ -378,7 +378,6 @@ define([
         // Toggle the 'active' class on the clear button
         transparentButton.classList.toggle('active')
         document.getElementById("volume-button").style.backgroundImage = 'url(icons/transparent_volume.svg)'
-        console.log("it is beign clicked now!!")
         console.log(defaultVolume)
 
         if (defaultVolume) {
@@ -431,13 +430,15 @@ define([
 
 
       let addShape = {
-        cube: false,
+        cube: true,
         tetra: false,
         octa: false,
         dodeca: false,
         deca: false,
         icosa: false
       };
+      document.getElementById('cube-button').classList.toggle('active');
+
       
       const buttons = ['cube', 'tetra', 'octa', 'dodeca', 'deca', 'icosa'];
       const clearButton = document.getElementById('clear-button');
@@ -1598,6 +1599,7 @@ define([
           [0.067, 0.25],
           [0.933, 0.25],
           [0.5, 1],
+          [0.25, 0.5]        
         ].map(p => {
           return new THREE.Vector2(...p)
         })
@@ -1612,14 +1614,16 @@ define([
             (baseUVs[1].y + v) / tileDimension.y,
             (baseUVs[2].x + u) / tileDimension.x,
             (baseUVs[2].y + v) / tileDimension.y,
-          )
+            (baseUVs[3].x + u) / tileDimension.x,
+            (baseUVs[3].y + v) / tileDimension.y
+        );
 
           ctx.textAlign = 'center'
           ctx.textBaseline = 'middle'
           ctx.font = `bold 200px Arial`
           ctx.fillStyle = textColor
           ctx.fillText(
-            i + 1 + (i == 5 || i == 8 ? '' : ''),
+            i + 1,
             (u + 0.5) * tileSize,
             c.height - (v + 0.5) * tileSize,
           )
