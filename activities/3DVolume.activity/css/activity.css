@@ -346,17 +346,21 @@ body {
 }
 
 #right-button {
-  background-image: url(../icons/right-arrow.svg);
+  background-image: url(../icons/go-right.svg);
 }
 #up-button {
-  background-image: url(../icons/up-arrow.svg);
+  background-image: url(../icons/go-right.svg);
+  transform: rotate(-90deg);
+
 }
 #down-button {
-  background-image: url(../icons/down-arrow.svg);
+  background-image: url(../icons/go-left.svg);
+  transform: rotate(-90deg);
+
 }
 
 #left-button {
-  background-image: url(../icons/left-arrow.svg);
+  background-image: url(../icons/go-left.svg);
 }
 
 .arrow-container {

@@ -63,6 +63,7 @@ define([
     let presentScore = 0
     let lastRoll = ''
     let diceArray = []
+    let journalDiceArray = []
     let showNumbers = false
     let showImage = false
     let imageData;
@@ -194,6 +195,73 @@ define([
       }
     }
 
+
+    document.getElementById("stop-button").addEventListener('click', function (event) {
+      for (let i = 0; i < diceArray.length; i++) {
+        journalDiceArray.push([diceArray[i][2], diceArray[i][0].position, diceArray[i][0].quaternion, diceArray[i][5], diceArray[i][6], diceArray[i][3], diceArray[i][4]]);
+      }
+      console.log("writing...");
+      var jsonData = JSON.stringify(journalDiceArray);
+      console.log(jsonData)
+      activity.getDatastoreObject().setDataAsText(jsonData);
+      activity.getDatastoreObject().save(function (error) {
+        if (error === null) {
+          console.log("write done.");
+        } else {
+          console.log("write failed.");
+        }
+      });
+    });
+
+    env.getEnvironment(function(err, environment) {
+      currentenv = environment;
+    
+      // Load from datastore
+      if (!environment.objectId) {
+        console.log("New instance");
+      } else {
+        activity.getDatastoreObject().loadAsText(function(error, metadata, data) {
+          if (error==null && data!=null) {
+            data = JSON.parse(data)
+            for (let i = 0; i < data.length; i++) {
+              console.log(data)
+              console.log(data[i][4])
+              console.log(data[i][5])
+
+              let fillColorStored = data[i][3]
+              let textColorStored = data[i][4]
+              console.log(fillColorStored)
+              switch(data[i][0]) {
+                case 'cube':
+                  createCube(fillColorStored, data[i][5], data[i][6], data[i][1].x, data[i][1].z, false, null, data[i][1].y, data[i][2], textColorStored)
+                  break;
+                case 'octa':
+                  // Code for octahedron
+                  break;
+                case 'tetra':
+                  // Code for tetrahedron
+                  break;
+                case 'deca':
+                  // Code for dodecahedron
+                  break;
+                case 'dodeca':
+                  // Code for dodecahedron
+                  break;
+                case 'icosa':
+                  // Code for icosahedron
+                  break;
+                default:
+                  // Default case (optional): Handle unexpected values
+                  console.log(`Unexpected shape: ${data[i][0]}`);
+                  break;
+              }
+              
+            }
+          }
+        });
+      }
+    });
+
     // Launch tutorial
     document
       .getElementById('help-button')
@@ -201,118 +269,114 @@ define([
         tutorial.start()
       })
 
+     
+    
+      const redSliderFill = document.getElementById("red-slider-fill");
+      const greenSliderFill = document.getElementById("green-slider-fill");
+      const blueSliderFill = document.getElementById("blue-slider-fill");
+      
+      let sliderColorFill = { r: 0, g: 0, b: 0 };
+      
+      function rgbToHex(r, g, b) {
+          return (
+              "#" +
+              ((1 << 24) + (r << 16) + (g << 8) + b)
+                  .toString(16)
+                  .slice(1)
+                  .toUpperCase()
+          );
+      }
+      
+      function hexToRgb(hex) {
+          let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+          return result
+              ? {
+                    r: parseInt(result[1], 16),
+                    g: parseInt(result[2], 16),
+                    b: parseInt(result[3], 16),
+                }
+              : null;
+      }
+      
+      function updateColorDisplayFill() {
+          const hexColor = rgbToHex(sliderColorFill.r, sliderColorFill.g, sliderColorFill.b);
+          presentColor = hexColor;
+          document.getElementById('color-button-fill').style.backgroundColor = presentColor;
+      }
+      
+      function updateSlidersFill(color) {
+          const rgb = color.match(/\d+/g).map(num => parseInt(num, 10));
+          redSliderFill.value = rgb[0];
+          greenSliderFill.value = rgb[1];
+          blueSliderFill.value = rgb[2];
+      }
+      
+      function handleSliderChangeFill() {
+          sliderColorFill = {
+              r: parseInt(redSliderFill.value),
+              g: parseInt(greenSliderFill.value),
+              b: parseInt(blueSliderFill.value),
+          };
+          updateColorDisplayFill();
+      }
+      
+      redSliderFill.addEventListener("input", handleSliderChangeFill);
+      greenSliderFill.addEventListener("input", handleSliderChangeFill);
+      blueSliderFill.addEventListener("input", handleSliderChangeFill);
+      
       document.addEventListener('color-selected-fill', function (event) {
-        const selectedColor = event.detail.color;
-        presentColor = selectedColor;
-        document.getElementById('color-button-fill').style.backgroundColor = presentColor;
-        updateSliders(selectedColor);
-    });
-    
-    const redSliderFill = document.getElementById("red-slider-fill");
-    const greenSliderFill = document.getElementById("green-slider-fill");
-    const blueSliderFill = document.getElementById("blue-slider-fill");
-    
-    let sliderColorFill = { r: 0, g: 0, b: 0 };
-    
-    function rgbToHex(r, g, b) {
-        return (
-            "#" +
-            ((1 << 24) + (r << 16) + (g << 8) + b)
-                .toString(16)
-                .slice(1)
-                .toUpperCase()
-        );
-    }
-    
-    function hexToRgb(hex) {
-        let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        return result
-            ? {
-                  r: parseInt(result[1], 16),
-                  g: parseInt(result[2], 16),
-                  b: parseInt(result[3], 16),
-              }
-            : null;
-    }
-    
-    function updateColorDisplayFill() {
-        const hexColor = rgbToHex(sliderColorFill.r, sliderColorFill.g, sliderColorFill.b);
-        presentColor = hexColor;
-        document.getElementById('color-button-fill').style.backgroundColor = presentColor;
-    }
-    
-    function updateSlidersFill(color) {
-        const rgb = color.match(/\d+/g).map(num => parseInt(num, 10));
-        redSliderFill.value = rgb[0];
-        greenSliderFill.value = rgb[1];
-        blueSliderFill.value = rgb[2];
-    }
-    
-    function handleSliderChangeFill() {
-        sliderColorText = {
-            r: parseInt(redSliderFill.value),
-            g: parseInt(greenSliderFill.value),
-            b: parseInt(blueSliderFill.value),
-        };
-        updateColorDisplayFill();
-    }
-    
-    redSliderFill.addEventListener("input", handleSliderChangeFill);
-    greenSliderFill.addEventListener("input", handleSliderChangeFill);
-    blueSliderFill.addEventListener("input", handleSliderChangeFill);
-
-
-    document.addEventListener('color-selected-fill', function (event) {
-      const selectedColorFill = event.detail.color;
-      presentColor = selectedColorFill;
-      document.getElementById('color-button-fill').style.backgroundColor = presentColor;
-      updateSlidersFill(selectedColorFill);
-  });
-
-
-
-
-
-  
-  const redSliderText = document.getElementById("red-slider-text");
-  const greenSliderText = document.getElementById("green-slider-text");
-  const blueSliderText = document.getElementById("blue-slider-text");
-  
-  let sliderColorText = { r: 0, g: 0, b: 0 };
-  
-  
-  function updateColorDisplayText() {
-      const hexColor = rgbToHex(sliderColorText.r, sliderColorText.g, sliderColorText.b);
-      textColor = hexColor;
-      document.getElementById('color-button-text').style.backgroundColor = textColor;
-  }
-  
-  function updateSlidersText(color) {
-      const rgb = color.match(/\d+/g).map(num => parseInt(num, 10));
-      redSliderText.value = rgb[0];
-      greenSliderText.value = rgb[1];
-      blueSliderText.value = rgb[2];
-  }
-  
-  function handleSliderChangeText() {
-      sliderColorText = {
-          r: parseInt(redSliderText.value),
-          g: parseInt(greenSliderText.value),
-          b: parseInt(blueSliderText.value),
-      };
-      updateColorDisplayText();
-  }
-  
-  redSliderText.addEventListener("input", handleSliderChangeText);
-  greenSliderText.addEventListener("input", handleSliderChangeText);
-  blueSliderText.addEventListener("input", handleSliderChangeText);
-
-  document.addEventListener('color-selected-text', function (event) {
-    const selectedColorText = event.detail.color;
-    textColor = selectedColorText;
-    document.getElementById('color-button-text').style.backgroundColor = textColor;
-    updateSlidersText(selectedColorFill);
-});
+          const selectedColorFill = event.detail.color;
+          presentColor = selectedColorFill;
+          document.getElementById('color-button-fill').style.backgroundColor = presentColor;
+          updateSlidersFill(selectedColorFill);
+      });
+      
+      
+      const redSliderText = document.getElementById("red-slider-text");
+      const greenSliderText = document.getElementById("green-slider-text");
+      const blueSliderText = document.getElementById("blue-slider-text");
+      
+      let sliderColorText = { r: 0, g: 0, b: 0 };
+      
+      function updateColorDisplayText() {
+          const hexColor = rgbToHex(sliderColorText.r, sliderColorText.g, sliderColorText.b);
+          textColor = hexColor;
+          document.getElementById('color-button-text').style.backgroundColor = textColor;
+      }
+      
+      function updateSlidersText(color) {
+          const rgb = color.match(/\d+/g).map(num => parseInt(num, 10));
+          redSliderText.value = rgb[0];
+          greenSliderText.value = rgb[1];
+          blueSliderText.value = rgb[2];
+      }
+      
+      function handleSliderChangeText() {
+          sliderColorText = {
+              r: parseInt(redSliderText.value),
+              g: parseInt(greenSliderText.value),
+              b: parseInt(blueSliderText.value),
+          };
+          updateColorDisplayText();
+      }
+      
+      redSliderText.addEventListener("input", handleSliderChangeText);
+      greenSliderText.addEventListener("input", handleSliderChangeText);
+      blueSliderText.addEventListener("input", handleSliderChangeText);
+      
+      document.addEventListener('color-selected-text', function (event) {
+          const selectedColorText = event.detail.color;
+          textColor = selectedColorText;
+          document.getElementById('color-button-text').style.backgroundColor = textColor;
+          updateSlidersText(selectedColorText);
+      });
+      
+// document.addEventListener('color-selected-fill', function (event) {
+//   const selectedColor = event.detail.color;
+//   presentColor = selectedColor;
+//   document.getElementById('color-button-fill').style.backgroundColor = presentColor;
+//   updateSlidersFill(selectedColor);
+// });
   
 
     
@@ -620,7 +684,7 @@ define([
     })
     renderer.shadowMap.enabled = true
 
-    let xCoordinate, zCoordinate
+    let xCoordinate, zCoordinate, yCoordinate
     const raycaster = new THREE.Raycaster()
     const mouse = new THREE.Vector2()
     document.querySelector('body').addEventListener('click', onRemoveClick)
@@ -823,15 +887,15 @@ define([
 
     const scene = new THREE.Scene()
     scene.background = new THREE.Color(presentColor)
-    const light = new THREE.DirectionalLight(0xffffff, 0.7)
+    const light = new THREE.DirectionalLight(0xffffff, 0.4)
     light.castShadow = true
     const leftLight = new THREE.DirectionalLight(0xffffff, 0.25)
     leftLight.castShadow = true
-    const rightLight = new THREE.DirectionalLight(0xffffff, 0.2)
+    const rightLight = new THREE.DirectionalLight(0xffffff, 0.1)
     rightLight.castShadow = true
-    const backLight = new THREE.DirectionalLight(0xffffff, 0.2)
+    const backLight = new THREE.DirectionalLight(0xffffff, 0.1)
     const bottomLight = new THREE.DirectionalLight(0xffffff, 0.1)
-    const topLight = new THREE.DirectionalLight(0xffffff, 0.7)
+    const topLight = new THREE.DirectionalLight(0xffffff, 0.2)
     topLight.castShadow = true
     leftLight.position.set(-30, 20, -30)
     rightLight.position.set(30, 20, -30)
@@ -871,7 +935,8 @@ define([
     const groundMesh = new THREE.Mesh(groundGeo, groundMat)
     groundMesh.receiveShadow = true
 
-    groundMesh.material.color.setHex(0x363636)
+    groundMesh.material.color.setHex(0xD3D3D3)
+    
     scene.add(groundMesh)
     const groundPhysMat = new CANNON.Material()
     const groundWidth = 0 // Desired width of the ground
@@ -962,18 +1027,24 @@ define([
     const goDownButton = document.querySelector('#down-button')
 
     // Add click event listener to the button
-    goRightButton.addEventListener('click', function () {
+    goRightButton.addEventListener('click', function (event) {
       orbit.rotateRight()
+      event.stopPropagation()
     })
 
-    goLeftButton.addEventListener('click', function () {
+    goLeftButton.addEventListener('click', function (event) {
       orbit.rotateLeft()
+      event.stopPropagation()
+
     })
-    goUpButton.addEventListener('click', function () {
+    goUpButton.addEventListener('click', function (event) {
       orbit.rotateUp()
+      event.stopPropagation()
+
     })
-    goDownButton.addEventListener('click', function () {
+    goDownButton.addEventListener('click', function (event) {
       orbit.rotateDown()
+      event.stopPropagation()
     })
     // Zoom code
     const evt = new Event('wheel', { bubbles: true, cancelable: true })
@@ -1041,6 +1112,9 @@ define([
     zoomToButton.addEventListener('click', zoomToFunction);
 
 
+  
+
+
 
     function createTetrahedron(
       sharedColor,
@@ -1049,13 +1123,18 @@ define([
       xCoordinateShared,
       zCoordinateShared,
       ifImage,
-      sharedImageData
+      sharedImageData,
+      yCoordinateShared,
+      quaternionShared,
+      sharedTextColor
     ) {
       let tetrahedron
       let tempShowNumbers = ifNumbers == null ? showNumbers : ifNumbers
       let tempTransparent =
         ifTransparent == null ? toggleTransparent : ifTransparent
       let tempImage = ifImage == null ? showImage : ifImage
+      let tempFillColor = sharedColor != null ? sharedColor : presentColor
+      let tempTextColor = sharedTextColor != null ? sharedTextColor : textColor
       if (tempShowNumbers) {
         let tileDimension = new THREE.Vector2(4, 5)
         let tileSize = 512
@@ -1066,7 +1145,7 @@ define([
         c.width = tileSize * tileDimension.x
         c.height = tileSize * tileDimension.y
         let ctx = c.getContext('2d')
-        ctx.fillStyle = presentColor
+        ctx.fillStyle = tempFillColor
         ctx.fillRect(0, 0, c.width, c.height)
 
         let uvs = []
@@ -1099,7 +1178,7 @@ define([
           ctx.textAlign = 'center'
           ctx.textBaseline = 'middle'
           ctx.font = `bold 150px Arial`
-          ctx.fillStyle = textColor
+          ctx.fillStyle = tempTextColor
           // ctx.fillText(
           //   i + 1,
           //   (u + 0.5) * tileSize,
@@ -1213,7 +1292,7 @@ define([
       tetrahedronBody.applyImpulse(offset, rollingForce)
       tetrahedron.position.copy(tetrahedronBody.position) // this merges the physics body to threejs mesh
       tetrahedron.quaternion.copy(tetrahedronBody.quaternion)
-      diceArray.push([tetrahedron, tetrahedronBody, 'tetra'])
+      diceArray.push([tetrahedron, tetrahedronBody, 'tetra', ifNumbers, ifTransparent])
     }
 
     function createOctahedron(
@@ -1223,13 +1302,19 @@ define([
       xCoordinateShared,
       zCoordinateShared,
       ifImage,
-      sharedImageData
+      sharedImageData,
+      yCoordinateShared,
+      quaternionShared,
+      sharedTextColor
     ) {
       let octahedron
       let tempShowNumbers = ifNumbers == null ? showNumbers : ifNumbers
       let tempTransparent =
         ifTransparent == null ? toggleTransparent : ifTransparent
       let tempImage = ifImage == null ? showImage : ifImage
+      let tempFillColor = sharedColor != null ? sharedColor : presentColor
+      let tempTextColor = sharedTextColor != null ? sharedTextColor : textColor
+
       if (tempShowNumbers) {
         let tileDimension = new THREE.Vector2(4, 5)
         let tileSize = 512
@@ -1239,7 +1324,7 @@ define([
         c.width = tileSize * tileDimension.x
         c.height = tileSize * tileDimension.y
         let ctx = c.getContext('2d')
-        ctx.fillStyle = presentColor
+        ctx.fillStyle = tempFillColor
         ctx.fillRect(0, 0, c.width, c.height)
 
         let uvs = []
@@ -1267,7 +1352,7 @@ define([
           ctx.textAlign = 'center'
           ctx.textBaseline = 'middle'
           ctx.font = `bold 200px Arial`
-          ctx.fillStyle = textColor
+          ctx.fillStyle = tempTextColor
           ctx.fillText(
             i + 1 + (i == 5 || i == 8 ? '' : ''),
             (u + 0.5) * tileSize,
@@ -1371,7 +1456,7 @@ define([
       octahedronBody.applyImpulse(offset, rollingForce)
       octahedron.position.copy(octahedronBody.position) // this merges the physics body to threejs mesh
       octahedron.quaternion.copy(octahedronBody.quaternion)
-      diceArray.push([octahedron, octahedronBody, 'octa'])
+      diceArray.push([octahedron, octahedronBody, 'octa', ifNumbers, ifTransparent])
     }
 
     function createCube(
@@ -1381,13 +1466,18 @@ define([
       xCoordinateShared,
       zCoordinateShared,
       ifImage,
-      sharedImageData
+      sharedImageData,
+      yCoordinateShared,
+      quaternionShared,
+      sharedTextColor
     ) {
       let boxMesh
       let tempShowNumbers = ifNumbers == null ? showNumbers : ifNumbers
       let tempTransparent =
         ifTransparent == null ? toggleTransparent : ifTransparent
       let tempImage = ifImage == null ? showImage : ifImage;
+      let tempFillColor = sharedColor != null ? sharedColor : presentColor
+      let tempTextColor = sharedTextColor != null ? sharedTextColor : textColor
       if (tempShowNumbers) {
         let tileDimension = new THREE.Vector2(4, 2)
         let tileSize = 512
@@ -1397,7 +1487,7 @@ define([
         c.width = tileSize * tileDimension.x
         c.height = tileSize * tileDimension.y
         let ctx = c.getContext('2d')
-        ctx.fillStyle = sharedColor != null ? sharedColor : presentColor
+        ctx.fillStyle = tempFillColor
         ctx.fillRect(0, 0, c.width, c.height)
 
         let baseUVs = [
@@ -1424,7 +1514,7 @@ define([
           ctx.textAlign = 'center'
           ctx.textBaseline = 'middle'
           ctx.font = `bold 300px Arial`
-          ctx.fillStyle = textColor
+          ctx.fillStyle = tempTextColor
           ctx.fillText(
             i + 1,
             (u + 0.5) * tileSize,
@@ -1479,20 +1569,25 @@ define([
 
       const boxPhysmat = new CANNON.Material()
 
-
+      console.log(yCoordinateShared)
       let x = xCoordinateShared == null ? xCoordinate : xCoordinateShared
       let z = zCoordinateShared == null ? zCoordinate : zCoordinateShared
+      let y = yCoordinateShared == null ? 10 : yCoordinateShared
       const boxBody = new CANNON.Body({
         mass: 1,
         shape: new CANNON.Box(new CANNON.Vec3(1, 1, 1)),
-        position: new CANNON.Vec3(xCoordinate, 10, zCoordinate),
+        position: new CANNON.Vec3(x, y, z),
         material: boxPhysmat,
         friction: 0.1,
         restitution: 5,
       })
-      boxBody.addEventListener('click', function (boxBody) {
-        console.log('clicked a box')
-      })
+      // if (quaternionShared != null && quaternionShared != undefined) {
+      // const quaternion = new CANNON.Quaternion();
+      // quaternion.setFromEuler(quaternionShared.x, quaternionShared.y, quaternionShared.z);
+      // boxBody.quaternion.copy(quaternion);
+      // }
+ 
+
 
       world.addBody(boxBody)
       if (tempShowNumbers) {
@@ -1518,7 +1613,7 @@ define([
       )
 
       world.addContactMaterial(groundBoxContactMat)
-      diceArray.push([boxMesh, boxBody, 'cube'])
+      diceArray.push([boxMesh, boxBody, 'cube', tempShowNumbers, tempTransparent, tempFillColor, tempTextColor ])
     }
 
     const cannonDebugger = new CannonDebugger(scene, world, {
@@ -1532,13 +1627,19 @@ define([
       xCoordinateShared,
       zCoordinateShared,
       ifImage,
-      sharedImageData
+      sharedImageData,
+      yCoordinateShared,
+      quaternionShared,
+      sharedTextColor
     ) {
       let decahedron
       let tempShowNumbers = ifNumbers == null ? showNumbers : ifNumbers
       let tempTransparent =
         ifTransparent == null ? toggleTransparent : ifTransparent
       let tempImage = ifImage == null ? showImage : ifImage
+      let tempFillColor = sharedColor != null ? sharedColor : presentColor
+      let tempTextColor = sharedTextColor != null ? sharedTextColor : textColor
+
 
       const sides = 10;
   const radius = 1;
@@ -1579,6 +1680,7 @@ define([
   let decaGeometry = new THREE.PolyhedronGeometry(...args);
 
 
+
       if (tempShowNumbers) {
         let tileDimension = new THREE.Vector2(4, 5)
         let tileSize = 512
@@ -1588,7 +1690,7 @@ define([
         c.width = tileSize * tileDimension.x
         c.height = tileSize * tileDimension.y
         let ctx = c.getContext('2d')
-        ctx.fillStyle = presentColor
+        ctx.fillStyle = tempColor
         ctx.fillRect(0, 0, c.width, c.height)
 
         let uvs = []
@@ -1621,7 +1723,7 @@ define([
           ctx.textAlign = 'center'
           ctx.textBaseline = 'middle'
           ctx.font = `bold 200px Arial`
-          ctx.fillStyle = textColor
+          ctx.fillStyle = tempTextColor
           ctx.fillText(
             i + 1,
             (u + 0.5) * tileSize,
@@ -1678,6 +1780,7 @@ define([
       decahedron.rotation.set(Math.PI / 4, Math.PI / 4, 0) // Rotates 90 degrees on X, 45 degrees on Y
       decahedron.castShadow = true
       scene.add(decahedron)
+      console.log(decahedron)
 
       const t = (1 + Math.sqrt(5)) / 2;
 const r = 1 / t;
@@ -1725,7 +1828,7 @@ const verticesCannon = [];
       decahedronBody.applyImpulse(offset, rollingForce)
       decahedron.position.copy(decahedronBody.position) // this merges the physics body to threejs mesh
       decahedron.quaternion.copy(decahedronBody.quaternion)
-      diceArray.push([decahedron, decahedronBody, 'deca'])
+      diceArray.push([decahedron, decahedronBody, 'deca', ifNumbers, ifTransparent])
     }
 
     function createDodecahedron(
@@ -1735,13 +1838,18 @@ const verticesCannon = [];
       xCoordinateShared,
       zCoordinateShared,
       ifImage,
-      sharedImageData
+      sharedImageData,
+      yCoordinateShared,
+      quaternionShared,
+      sharedTextColor
     ) {
       let dodecahedron
       let tempShowNumbers = ifNumbers == null ? showNumbers : ifNumbers
       let tempTransparent =
         ifTransparent == null ? toggleTransparent : ifTransparent
       let tempImage = ifImage == null ? showImage : ifImage
+      let tempFillColor = sharedColor != null ? sharedColor : presentColor
+      let tempTextColor = sharedTextColor != null ? sharedTextColor : textColor
       if (tempShowNumbers) {
         let tileDimension = new THREE.Vector2(4, 3); // 12 faces, arranged in a 4x3 grid
         let tileSize = 512;
@@ -1751,7 +1859,7 @@ const verticesCannon = [];
         c.width = tileSize * tileDimension.x;
         c.height = tileSize * tileDimension.y;
         let ctx = c.getContext('2d');
-        ctx.fillStyle = presentColor;
+        ctx.fillStyle = tempFillColor;
         ctx.fillRect(0, 0, c.width, c.height);
     
         let uvs = [];
@@ -1786,7 +1894,7 @@ const verticesCannon = [];
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.font = `bold ${tileSize / 3}px Arial`;
-            ctx.fillStyle = textColor;
+            ctx.fillStyle = tempTextColor;
             ctx.fillText(
                 i + 1,
                 (u + 0.5) * tileSize,
@@ -1918,7 +2026,7 @@ const indices = [
       dodecahedronBody.applyImpulse(offset, rollingForce)
       dodecahedron.position.copy(dodecahedronBody.position) // this merges the physics body to threejs mesh
       dodecahedron.quaternion.copy(dodecahedronBody.quaternion)
-      diceArray.push([dodecahedron, dodecahedronBody, 'dodeca'])
+      diceArray.push([dodecahedron, dodecahedronBody, 'dodeca', ifNumbers, ifTransparent])
     }
 
   
@@ -1932,12 +2040,18 @@ const indices = [
       xCoordinateShared,
       zCoordinateShared,
       ifImage,
-      sharedImageData
+      sharedImageData,
+      yCoordinateShared,
+      quaternionShared,
+      sharedTextColor
     ) {
       let icosahedron
       let tempShowNumbers = ifNumbers == null ? showNumbers : ifNumbers
       let tempTransparent = ifTransparent == null ? toggleTransparent : ifTransparent
       let tempImage = ifImage == null ? showImage : ifImage
+      let tempFillColor = sharedColor != null ? sharedColor : presentColor
+      let tempTextColor = sharedTextColor != null ? sharedTextColor : textColor
+
       if (tempShowNumbers) {
         let tileDimension = new THREE.Vector2(4, 5)
         let tileSize = 512
@@ -1948,7 +2062,7 @@ const indices = [
         c.width = tileSize * tileDimension.x
         c.height = tileSize * tileDimension.y
         let ctx = c.getContext('2d')
-        ctx.fillStyle = presentColor
+        ctx.fillStyle = tempFillColor
         ctx.fillRect(0, 0, c.width, c.height)
 
         let uvs = []
@@ -1981,7 +2095,7 @@ const indices = [
           ctx.textAlign = 'center'
           ctx.textBaseline = 'middle'
           ctx.font = `bold 175px Arial`
-          ctx.fillStyle = textColor
+          ctx.fillStyle = tempTextColor
           // ctx.fillText(
           //   i + 1,
           //   (u + 0.5) * tileSize,
@@ -2098,7 +2212,7 @@ const icosahedronShape = new CANNON.ConvexPolyhedron({
       icosahedronBody.applyImpulse(offset, rollingForce)
       icosahedron.position.copy(icosahedronBody.position) // this merges the physics body to threejs mesh
       icosahedron.quaternion.copy(icosahedronBody.quaternion)
-      diceArray.push([icosahedron, icosahedronBody, 'icosa'])
+      diceArray.push([icosahedron, icosahedronBody, 'icosa', ifNumbers, ifTransparent])
     }
 
 
@@ -2344,6 +2458,7 @@ const icosahedronShape = new CANNON.ConvexPolyhedron({
     function animate() {
       world.step(timeStep)
       // cannonDebugger.update();
+    
 
       groundMesh.position.copy(groundBody.position)
       groundMesh.quaternion.copy(groundBody.quaternion)
