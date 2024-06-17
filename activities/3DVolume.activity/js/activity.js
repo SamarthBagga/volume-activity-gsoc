@@ -198,7 +198,7 @@ define([
 
     document.getElementById("stop-button").addEventListener('click', function (event) {
       for (let i = 0; i < diceArray.length; i++) {
-        journalDiceArray.push([diceArray[i][2], diceArray[i][0].position, diceArray[i][0].quaternion, diceArray[i][5], diceArray[i][6], diceArray[i][3], diceArray[i][4]]);
+        journalDiceArray.push([diceArray[i][2], diceArray[i][1].position, diceArray[i][1].quaternion, diceArray[i][5], diceArray[i][6], diceArray[i][3], diceArray[i][4]]);
       }
       console.log("writing...");
       var jsonData = JSON.stringify(journalDiceArray);
@@ -224,31 +224,26 @@ define([
           if (error==null && data!=null) {
             data = JSON.parse(data)
             for (let i = 0; i < data.length; i++) {
-              console.log(data)
-              console.log(data[i][4])
-              console.log(data[i][5])
-
               let fillColorStored = data[i][3]
               let textColorStored = data[i][4]
-              console.log(fillColorStored)
               switch(data[i][0]) {
                 case 'cube':
                   createCube(fillColorStored, data[i][5], data[i][6], data[i][1].x, data[i][1].z, false, null, data[i][1].y, data[i][2], textColorStored)
                   break;
                 case 'octa':
-                  // Code for octahedron
+                  createOctahedron(fillColorStored, data[i][5], data[i][6], data[i][1].x, data[i][1].z, false, null, data[i][1].y, data[i][2], textColorStored)
                   break;
                 case 'tetra':
-                  // Code for tetrahedron
+                  createTetrahedron(fillColorStored, data[i][5], data[i][6], data[i][1].x, data[i][1].z, false, null, data[i][1].y, data[i][2], textColorStored)
                   break;
                 case 'deca':
-                  // Code for dodecahedron
+                  createDecahedron(fillColorStored, data[i][5], data[i][6], data[i][1].x, data[i][1].z, false, null, data[i][1].y, data[i][2], textColorStored)
                   break;
                 case 'dodeca':
-                  // Code for dodecahedron
+                  createDodecahedron(fillColorStored, data[i][5], data[i][6], data[i][1].x, data[i][1].z, false, null, data[i][1].y, data[i][2], textColorStored)
                   break;
                 case 'icosa':
-                  // Code for icosahedron
+                  createIcosahedron(fillColorStored, data[i][5], data[i][6], data[i][1].x, data[i][1].z, false, null, data[i][1].y, data[i][2], textColorStored)
                   break;
                 default:
                   // Default case (optional): Handle unexpected values
@@ -1269,11 +1264,13 @@ define([
 
       let x = xCoordinateShared == null ? xCoordinate : xCoordinateShared
       let z = zCoordinateShared == null ? zCoordinate : zCoordinateShared
+      let y = yCoordinateShared == null ? 10 : yCoordinateShared
+
 
       const tetrahedronBody = new CANNON.Body({
         mass: 2, // Set mass
         shape: tetrahedronShape,
-        position: new CANNON.Vec3(x, 10, z),
+        position: new CANNON.Vec3(x, y, z),
         friction: -1,
         restitution: 5,
       })
@@ -1292,8 +1289,12 @@ define([
       tetrahedronBody.applyImpulse(offset, rollingForce)
       tetrahedron.position.copy(tetrahedronBody.position) // this merges the physics body to threejs mesh
       tetrahedron.quaternion.copy(tetrahedronBody.quaternion)
-      diceArray.push([tetrahedron, tetrahedronBody, 'tetra', ifNumbers, ifTransparent])
-    }
+      if (quaternionShared != null && quaternionShared != undefined) {
+        tetrahedron.quaternion.copy(quaternionShared);
+        tetrahedronBody.quaternion.copy(quaternionShared)
+        }
+        diceArray.push([tetrahedron, tetrahedronBody, 'tetra', tempShowNumbers, tempTransparent, tempFillColor, tempTextColor ])
+      }
 
     function createOctahedron(
       sharedColor,
@@ -1432,11 +1433,12 @@ define([
       })
       let x = xCoordinateShared == null ? xCoordinate : xCoordinateShared
       let z = zCoordinateShared == null ? zCoordinate : zCoordinateShared
+      let y = yCoordinateShared == null ? 10 : yCoordinateShared
 
       const octahedronBody = new CANNON.Body({
         mass: 2, // Set mass
         shape: octahedronShape,
-        position: new CANNON.Vec3(x, 10, z),
+        position: new CANNON.Vec3(x, y, z),
         friction: -1,
         restitution: 5,
       })
@@ -1456,7 +1458,11 @@ define([
       octahedronBody.applyImpulse(offset, rollingForce)
       octahedron.position.copy(octahedronBody.position) // this merges the physics body to threejs mesh
       octahedron.quaternion.copy(octahedronBody.quaternion)
-      diceArray.push([octahedron, octahedronBody, 'octa', ifNumbers, ifTransparent])
+      if (quaternionShared != null && quaternionShared != undefined) {
+        octahedron.quaternion.copy(quaternionShared);
+        octahedronBody.quaternion.copy(quaternionShared)
+        }
+      diceArray.push([octahedron, octahedronBody, 'octa', tempShowNumbers, tempTransparent, tempFillColor, tempTextColor])
     }
 
     function createCube(
@@ -1569,10 +1575,10 @@ define([
 
       const boxPhysmat = new CANNON.Material()
 
-      console.log(yCoordinateShared)
       let x = xCoordinateShared == null ? xCoordinate : xCoordinateShared
       let z = zCoordinateShared == null ? zCoordinate : zCoordinateShared
       let y = yCoordinateShared == null ? 10 : yCoordinateShared
+      
       const boxBody = new CANNON.Body({
         mass: 1,
         shape: new CANNON.Box(new CANNON.Vec3(1, 1, 1)),
@@ -1581,15 +1587,12 @@ define([
         friction: 0.1,
         restitution: 5,
       })
-      // if (quaternionShared != null && quaternionShared != undefined) {
-      // const quaternion = new CANNON.Quaternion();
-      // quaternion.setFromEuler(quaternionShared.x, quaternionShared.y, quaternionShared.z);
-      // boxBody.quaternion.copy(quaternion);
-      // }
+      
  
 
 
       world.addBody(boxBody)
+
       if (tempShowNumbers) {
         boxBody.addEventListener('sleep', () => {
           sleepCounter++;
@@ -1613,6 +1616,10 @@ define([
       )
 
       world.addContactMaterial(groundBoxContactMat)
+      if (quaternionShared != null && quaternionShared != undefined) {
+        boxMesh.quaternion.copy(quaternionShared);
+        boxBody.quaternion.copy(quaternionShared)
+        }
       diceArray.push([boxMesh, boxBody, 'cube', tempShowNumbers, tempTransparent, tempFillColor, tempTextColor ])
     }
 
@@ -1690,7 +1697,7 @@ define([
         c.width = tileSize * tileDimension.x
         c.height = tileSize * tileDimension.y
         let ctx = c.getContext('2d')
-        ctx.fillStyle = tempColor
+        ctx.fillStyle = tempFillColor
         ctx.fillRect(0, 0, c.width, c.height)
 
         let uvs = []
@@ -1804,11 +1811,12 @@ const verticesCannon = [];
 
       let x = xCoordinateShared == null ? xCoordinate : xCoordinateShared
       let z = zCoordinateShared == null ? zCoordinate : zCoordinateShared
+      let y = yCoordinateShared == null ? 10 : yCoordinateShared
 
       const decahedronBody = new CANNON.Body({
         mass: 2, // Set mass
         shape: decahedronShape,
-        position: new CANNON.Vec3(x, 10, z),
+        position: new CANNON.Vec3(x, y, z),
         friction: -1,
         restitution: 5,
       })
@@ -1828,7 +1836,13 @@ const verticesCannon = [];
       decahedronBody.applyImpulse(offset, rollingForce)
       decahedron.position.copy(decahedronBody.position) // this merges the physics body to threejs mesh
       decahedron.quaternion.copy(decahedronBody.quaternion)
-      diceArray.push([decahedron, decahedronBody, 'deca', ifNumbers, ifTransparent])
+
+      if (quaternionShared != null && quaternionShared != undefined) {
+        decahedron.quaternion.copy(quaternionShared);
+        decahedronBody.quaternion.copy(quaternionShared)
+        }
+
+      diceArray.push([decahedron, decahedronBody, 'deca', tempShowNumbers, tempTransparent, tempFillColor, tempTextColor])
     }
 
     function createDodecahedron(
@@ -2003,11 +2017,13 @@ const indices = [
 
       let x = xCoordinateShared == null ? xCoordinate : xCoordinateShared
       let z = zCoordinateShared == null ? zCoordinate : zCoordinateShared
+      let y = yCoordinateShared == null ? 10 : yCoordinateShared
+
 
       const dodecahedronBody = new CANNON.Body({
         mass: 2, // Set mass
         shape: dodecahedronShape,
-        position: new CANNON.Vec3(x, 10, z),
+        position: new CANNON.Vec3(x, y, z),
         friction: -1,
         restitution: 5,
       })
@@ -2026,7 +2042,11 @@ const indices = [
       dodecahedronBody.applyImpulse(offset, rollingForce)
       dodecahedron.position.copy(dodecahedronBody.position) // this merges the physics body to threejs mesh
       dodecahedron.quaternion.copy(dodecahedronBody.quaternion)
-      diceArray.push([dodecahedron, dodecahedronBody, 'dodeca', ifNumbers, ifTransparent])
+      if (quaternionShared != null && quaternionShared != undefined) {
+        dodecahedron.quaternion.copy(quaternionShared);
+        dodecahedronBody.quaternion.copy(quaternionShared)
+        }
+      diceArray.push([dodecahedron, dodecahedronBody, 'dodeca', tempShowNumbers, tempTransparent, tempFillColor, tempTextColor ])
     }
 
   
@@ -2188,11 +2208,13 @@ const icosahedronShape = new CANNON.ConvexPolyhedron({
 
       let x = xCoordinateShared == null ? xCoordinate : xCoordinateShared
       let z = zCoordinateShared == null ? zCoordinate : zCoordinateShared
+      let y = yCoordinateShared == null ? 10 : yCoordinateShared
+
 
       const icosahedronBody = new CANNON.Body({
         mass: 2, // Set mass
         shape: icosahedronShape,
-        position: new CANNON.Vec3(x, 10, z),
+        position: new CANNON.Vec3(x, y, z),
         friction: -1,
         restitution: 5,
       })
@@ -2212,7 +2234,13 @@ const icosahedronShape = new CANNON.ConvexPolyhedron({
       icosahedronBody.applyImpulse(offset, rollingForce)
       icosahedron.position.copy(icosahedronBody.position) // this merges the physics body to threejs mesh
       icosahedron.quaternion.copy(icosahedronBody.quaternion)
-      diceArray.push([icosahedron, icosahedronBody, 'icosa', ifNumbers, ifTransparent])
+
+      if (quaternionShared != null && quaternionShared != undefined) {
+        icosahedron.quaternion.copy(quaternionShared);
+        icosahedronBody.quaternion.copy(quaternionShared)
+        }
+
+      diceArray.push([icosahedron, icosahedronBody, 'icosa', tempShowNumbers, tempTransparent, tempFillColor, tempTextColor])
     }
 
 
