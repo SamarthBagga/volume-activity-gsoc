@@ -828,12 +828,26 @@ define([
         if (intersectedObject.geometry.type == 'PlaneGeometry') {
           return
         }
+        let num = 0;
         for (let i = 0; i < diceArray.length; i++) {
+          if (diceArray[i][3]) {
+            num++;
+          }
+        }
+        for (let i = 0; i < diceArray.length; i++) {
+          console.log(intersectedObject)
+          console.log(diceArray[i][0])
           if (diceArray[i][0] == intersectedObject) {
+            if (diceArray[i][3]) {
+              num--;
+            }
             world.removeBody(diceArray[i][1])
             scene.remove(diceArray[i][0])
             diceArray.splice(i, 1)
           }
+        }
+        if (num == 0) {
+          lastRollElement.textContent = ''
         }
       }
     }
@@ -1822,9 +1836,8 @@ const verticesCannon = [];
       })
       if (tempShowNumbers) {
         decahedronBody.addEventListener('sleep', () => {
-          console.log("going to sleep now deca")
           sleepCounter++;
-          getTetraScore(decahedron)
+          getDecaScore(decahedron)
         })
       }
       world.addBody(decahedronBody)
@@ -1867,7 +1880,7 @@ const verticesCannon = [];
       if (tempShowNumbers) {
         let tileDimension = new THREE.Vector2(4, 3); // 12 faces, arranged in a 4x3 grid
         let tileSize = 512;
-        let g = new THREE.DodecahedronGeometry(2);
+        let g = new THREE.DodecahedronGeometry(1.25);
     
         let c = document.createElement('canvas');
         c.width = tileSize * tileDimension.x;
@@ -1929,7 +1942,7 @@ const verticesCannon = [];
         dodecahedron = new THREE.Mesh(g, m);
     
       } else if (tempTransparent) {
-        const dodedodecahedronTransaprentGeometry = new THREE.DodecahedronGeometry(2) // Size of the tetrahedron
+        const dodedodecahedronTransaprentGeometry = new THREE.DodecahedronGeometry(1.25) // Size of the tetrahedron
         const wireframe = new THREE.WireframeGeometry(
           dodedodecahedronTransaprentGeometry,
         )
@@ -1953,7 +1966,7 @@ const verticesCannon = [];
         // Create cube mesh with the material
         dodecahedron = new THREE.Mesh(dodecaGeo, material)
       } else {
-        const dodecahedronGeometry = new THREE.DodecahedronGeometry(2) // Size of the tetrahedron
+        const dodecahedronGeometry = new THREE.DodecahedronGeometry(1.25) // Size of the tetrahedron
 
         const dodecaMaterial = new THREE.MeshStandardMaterial({
           color: sharedColor != null ? sharedColor : presentColor,
@@ -1967,9 +1980,9 @@ const verticesCannon = [];
       dodecahedron.castShadow = true
       scene.add(dodecahedron)
 
-      const t = (1 + Math.sqrt(5)) / 2;
-const r = 1 / t;
-const scaleFactor = 1;
+      const t = 1.618;
+const r = 0.618;
+const scaleFactor = 0.75;
 
 const vertices = [
   new CANNON.Vec3(-1, -1, -1).scale(scaleFactor),
@@ -2030,7 +2043,7 @@ const indices = [
       if (tempShowNumbers) {
         dodecahedronBody.addEventListener('sleep', () => {
           sleepCounter++;
-          getTetraScore(dodecahedron)
+          getDodecaScore(dodecahedron)
         })
       }
       world.addBody(dodecahedronBody)
@@ -2075,7 +2088,7 @@ const indices = [
       if (tempShowNumbers) {
         let tileDimension = new THREE.Vector2(4, 5)
         let tileSize = 512
-        let g = new THREE.IcosahedronGeometry(2)
+        let g = new THREE.IcosahedronGeometry(1)
 
         let c = document.createElement('canvas')
         let div = document.createElement('div')
@@ -2141,7 +2154,7 @@ const indices = [
 
         icosahedron = new THREE.Mesh(g, m)
       } else if (tempTransparent) {
-        const icosahedronTransparentGeometry = new THREE.IcosahedronGeometry(2) // Size of the Icosahedron   
+        const icosahedronTransparentGeometry = new THREE.IcosahedronGeometry(1) // Size of the Icosahedron   
         const wireframe = new THREE.WireframeGeometry(
           icosahedronTransparentGeometry,
         )
@@ -2165,7 +2178,7 @@ const indices = [
         // Create cube mesh with the material
         icosahedron = new THREE.Mesh(boxGeo, material)
       } else {
-        const icosahedronGeometry = new THREE.IcosahedronGeometry(2) // Size of the icosahedron
+        const icosahedronGeometry = new THREE.IcosahedronGeometry(1.25) // Size of the icosahedron
 
         const icosaMaterial = new THREE.MeshStandardMaterial({
           color: sharedColor != null ? sharedColor : presentColor,
@@ -2181,7 +2194,7 @@ const indices = [
       // Vertices
 // Vertices
 const t = (1 + Math.sqrt(5)) / 2;
-const scaleFactor = 0.7;
+const scaleFactor = 0.5;
 const verticesIcosa = [
     new CANNON.Vec3(-1, t, 0).scale(scaleFactor), new CANNON.Vec3(1, t, 0).scale(scaleFactor),
     new CANNON.Vec3(-1, -t, 0).scale(scaleFactor), new CANNON.Vec3(1, -t, 0).scale(scaleFactor),
@@ -2220,9 +2233,9 @@ const icosahedronShape = new CANNON.ConvexPolyhedron({
       })
       if (tempShowNumbers) {
         icosahedronBody.addEventListener('sleep', () => {
-          console.log("icosa going to sleep");
+          console.log("icosa going to sleep")
           sleepCounter++;
-          getTetraScore(icosahedron)
+          getIcosaScore(icosahedron)
         })
       }
       world.addBody(icosahedronBody)
@@ -2419,6 +2432,49 @@ const icosahedronShape = new CANNON.ConvexPolyhedron({
         }
       }
     }
+
+    function getDecaScore(body) {
+      console.log("getting deca");
+    }
+
+    function getIcosaScore(body) {
+      console.log("getting icosa");
+    }
+
+    function getDodecaScore(body) {
+      // Define the golden ratio
+      const phi = (1 + Math.sqrt(5)) / 2;
+    
+      // Dodecahedron face vectors
+      const faceVectors = [
+        { vector: new THREE.Vector3(1, 1, 1), face: 1 },
+        { vector: new THREE.Vector3(1, 1, -1), face: 6 },
+        { vector: new THREE.Vector3(1, -1, 1), face: 11 },
+        { vector: new THREE.Vector3(1, -1, -1), face: 4 },
+        { vector: new THREE.Vector3(-1, 1, 1), face: 7 },
+        { vector: new THREE.Vector3(-1, 1, -1), face: 2 },
+        { vector: new THREE.Vector3(-1, -1, 1), face: 5 },
+        { vector: new THREE.Vector3(-1, -1, -1), face: 8 },
+        { vector: new THREE.Vector3(0, phi, 1/phi), face: 9 },
+        { vector: new THREE.Vector3(0, phi, -1/phi), face: 10 },
+        { vector: new THREE.Vector3(0, -phi, 1/phi), face: 3 },
+        { vector: new THREE.Vector3(0, -phi, -1/phi), face: 12 }
+      ];
+    
+      for (const faceVector of faceVectors) {
+        faceVector.vector.normalize().applyEuler(body.rotation);
+    
+        if (Math.round(faceVector.vector.y) === 1) {
+          lastRoll += faceVector.face + ' + ';
+          presentScore += faceVector.face;
+          updateElements();
+          break;
+        }
+      }
+    }
+    
+    
+
     function toggleTransparency() {
       for (let i = 0; i < diceArray.length; i++) {
         if (transparent) {
