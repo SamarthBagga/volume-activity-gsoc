@@ -835,8 +835,6 @@ define([
           }
         }
         for (let i = 0; i < diceArray.length; i++) {
-          console.log(intersectedObject)
-          console.log(diceArray[i][0])
           if (diceArray[i][0] == intersectedObject) {
             if (diceArray[i][3]) {
               num--;
@@ -1714,22 +1712,23 @@ define([
         ctx.fillStyle = tempFillColor
         ctx.fillRect(0, 0, c.width, c.height)
 
-        let uvs = []
-
-
-
-        let baseUVs = [
-          [0.067, 0.25],
-          [0.933, 0.25],
-          [0.5, 1],
-          [0.25, 0.5]        
-        ].map(p => {
-          return new THREE.Vector2(...p)
-        })
-
+          let baseUVs = [
+            [0.1, 0.25], // bt
+            [0.933, 0.25], //br
+            [0.5, 1], // tl
+            [0.5,0.15]
+          ].map(p => {
+            return new THREE.Vector2(...p)
+          });
+          
+          
+          // Initialize UVs array
+          let uvs = [];
+        
+        // Loop to generate UVs and draw numbers on the canvas
         for (let i = 0; i < 10; i++) {
-          let u = i % tileDimension.x
-          let v = Math.floor(i / tileDimension.x)
+          let u = i % tileDimension.x;
+          let v = Math.floor(i / tileDimension.x);
           uvs.push(
             (baseUVs[0].x + u) / tileDimension.x,
             (baseUVs[0].y + v) / tileDimension.y,
@@ -1738,8 +1737,9 @@ define([
             (baseUVs[2].x + u) / tileDimension.x,
             (baseUVs[2].y + v) / tileDimension.y,
             (baseUVs[3].x + u) / tileDimension.x,
-            (baseUVs[3].y + v) / tileDimension.y
-        );
+            (baseUVs[3].y + v) / tileDimension.y,
+
+          );
 
           ctx.textAlign = 'center'
           ctx.textBaseline = 'middle'
@@ -1794,6 +1794,7 @@ define([
           color: sharedColor != null ? sharedColor : presentColor,
           wireframe: false,
         })
+
 
         decahedron = new THREE.Mesh(decahedronGeometry, decaMaterial)
       }
@@ -1856,6 +1857,29 @@ const verticesCannon = [];
         }
 
       diceArray.push([decahedron, decahedronBody, 'deca', tempShowNumbers, tempTransparent, tempFillColor, tempTextColor])
+    }
+
+
+    function makeNumbers(){
+      let c = document.createElement("canvas");
+      c.width = 1024;
+      c.height = 1024;
+      let ctx = c.getContext("2d");
+      ctx.fillStyle = "#f0f";
+      ctx.fillRect(0, 0, c.width, c.height);
+    
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = "#0f8";
+      ctx.font = 'bold 60px Arial';
+      let step = 1024 / 10;
+      let start = step * 0.5;
+    
+      for (let i = 0; i < 10; i++){
+        ctx.fillText(i + 1, start + step * i, 512);
+      }
+    
+      return new THREE.CanvasTexture(c);
     }
 
     function createDodecahedron(
@@ -2066,7 +2090,7 @@ const indices = [
 
     
 
-    function createIcosahedron(
+    function  createIcosahedron(
       sharedColor,
       ifNumbers,
       ifTransparent,
@@ -2088,10 +2112,9 @@ const indices = [
       if (tempShowNumbers) {
         let tileDimension = new THREE.Vector2(4, 5)
         let tileSize = 512
-        let g = new THREE.IcosahedronGeometry(1)
+        let g = new THREE.IcosahedronGeometry(1.2)
 
         let c = document.createElement('canvas')
-        let div = document.createElement('div')
         c.width = tileSize * tileDimension.x
         c.height = tileSize * tileDimension.y
         let ctx = c.getContext('2d')
@@ -2107,12 +2130,6 @@ const indices = [
         ].map(p => {
           return new THREE.Vector2(...p)
         })
-        let arrOfNums = [
-          [2, 1, 3],
-          [1, 2, 4],
-          [3, 1, 4],
-          [2, 3, 4],
-        ]
         for (let i = 0; i < 20; i++) {
           let u = i % tileDimension.x
           let v = Math.floor(i / tileDimension.x)
@@ -2129,14 +2146,6 @@ const indices = [
           ctx.textBaseline = 'middle'
           ctx.font = `bold 175px Arial`
           ctx.fillStyle = tempTextColor
-          // ctx.fillText(
-          //   i + 1,
-          //   (u + 0.5) * tileSize,
-          //   c.height - (v + 0.5) * tileSize
-          // );
-          let aStep = (Math.PI * 2) / 3
-          let yAlign = Math.PI * 0.5
-          let tileQuarter = tileSize * 0.25
           ctx.fillText(
             i + 1,
             (u + 0.5) * tileSize,
@@ -2154,7 +2163,7 @@ const indices = [
 
         icosahedron = new THREE.Mesh(g, m)
       } else if (tempTransparent) {
-        const icosahedronTransparentGeometry = new THREE.IcosahedronGeometry(1) // Size of the Icosahedron   
+        const icosahedronTransparentGeometry = new THREE.IcosahedronGeometry(1.15) // Size of the Icosahedron   
         const wireframe = new THREE.WireframeGeometry(
           icosahedronTransparentGeometry,
         )
@@ -2178,7 +2187,7 @@ const indices = [
         // Create cube mesh with the material
         icosahedron = new THREE.Mesh(boxGeo, material)
       } else {
-        const icosahedronGeometry = new THREE.IcosahedronGeometry(1.25) // Size of the icosahedron
+        const icosahedronGeometry = new THREE.IcosahedronGeometry(1.2) // Size of the icosahedron
 
         const icosaMaterial = new THREE.MeshStandardMaterial({
           color: sharedColor != null ? sharedColor : presentColor,
@@ -2194,7 +2203,7 @@ const indices = [
       // Vertices
 // Vertices
 const t = (1 + Math.sqrt(5)) / 2;
-const scaleFactor = 0.5;
+const scaleFactor = 0.6;
 const verticesIcosa = [
     new CANNON.Vec3(-1, t, 0).scale(scaleFactor), new CANNON.Vec3(1, t, 0).scale(scaleFactor),
     new CANNON.Vec3(-1, -t, 0).scale(scaleFactor), new CANNON.Vec3(1, -t, 0).scale(scaleFactor),
@@ -2233,11 +2242,12 @@ const icosahedronShape = new CANNON.ConvexPolyhedron({
       })
       if (tempShowNumbers) {
         icosahedronBody.addEventListener('sleep', () => {
-          console.log("icosa going to sleep")
+          console.log("icosa going to sleeep")
           sleepCounter++;
           getIcosaScore(icosahedron)
         })
       }
+      icosahedronBody.sleepSpeedLimit = 0.2; // ugly hack to bypass the vibration issue in the ConvextPolyhedron class of cannon-es, port phyiscs engine to rapier before removing this :)
       world.addBody(icosahedronBody)
       icosahedronBody.angularVelocity.set(
         Math.random() - 0.5,
@@ -2438,8 +2448,57 @@ const icosahedronShape = new CANNON.ConvexPolyhedron({
     }
 
     function getIcosaScore(body) {
-      console.log("getting icosa");
+      // Define the golden ratio
+      const phi = (1 + Math.sqrt(5)) / 2;
+    
+      // Icosahedron face vectors
+      const faceVectors = [
+        { vector: new THREE.Vector3(0, 1, phi).normalize(), face: 1 },
+        { vector: new THREE.Vector3(0, -1, phi).normalize(), face: 2 },
+        { vector: new THREE.Vector3(0, 1, -phi).normalize(), face: 3 },
+        { vector: new THREE.Vector3(0, -1, -phi).normalize(), face: 4 },
+        { vector: new THREE.Vector3(1, phi, 0).normalize(), face: 5 },
+        { vector: new THREE.Vector3(-1, phi, 0).normalize(), face: 6 },
+        { vector: new THREE.Vector3(1, -phi, 0).normalize(), face: 7 },
+        { vector: new THREE.Vector3(-1, -phi, 0).normalize(), face: 8 },
+        { vector: new THREE.Vector3(phi, 0, 1).normalize(), face: 9 },
+        { vector: new THREE.Vector3(-phi, 0, 1).normalize(), face: 10 },
+        { vector: new THREE.Vector3(phi, 0, -1).normalize(), face: 11 },
+        { vector: new THREE.Vector3(-phi, 0, -1).normalize(), face: 12 },
+        { vector: new THREE.Vector3(1, phi, phi).normalize(), face: 13 },
+        { vector: new THREE.Vector3(-1, phi, phi).normalize(), face: 14 },
+        { vector: new THREE.Vector3(1, -phi, phi).normalize(), face: 15 },
+        { vector: new THREE.Vector3(-1, -phi, phi).normalize(), face: 16 },
+        { vector: new THREE.Vector3(1, phi, -phi).normalize(), face: 17 },
+        { vector: new THREE.Vector3(-1, phi, -phi).normalize(), face: 18 },
+        { vector: new THREE.Vector3(1, -phi, -phi).normalize(), face: 19 },
+        { vector: new THREE.Vector3(-1, -phi, -phi).normalize(), face: 20 }
+      ];
+    
+      for (const faceVector of faceVectors) {
+        faceVector.vector.applyEuler(body.rotation);
+    
+        if (Math.round(faceVector.vector.y) === 1) {
+          lastRoll += faceVector.face + ' + ';
+          presentScore += faceVector.face;
+          updateElements();
+          break;
+        }
+      }
     }
+    
+    
+    // Function to calculate a face vector based on spherical coordinates
+    function calculateFaceVector(theta, phi) {
+      return new THREE.Vector3(
+        Math.cos(theta) * Math.sin(phi),
+        Math.sin(theta) * Math.sin(phi),
+        Math.cos(phi)
+      );
+    }
+    
+    
+    
 
     function getDodecaScore(body) {
       // Define the golden ratio
@@ -2451,10 +2510,10 @@ const icosahedronShape = new CANNON.ConvexPolyhedron({
         { vector: new THREE.Vector3(1, 1, -1), face: 6 },
         { vector: new THREE.Vector3(1, -1, 1), face: 11 },
         { vector: new THREE.Vector3(1, -1, -1), face: 4 },
-        { vector: new THREE.Vector3(-1, 1, 1), face: 7 },
+        { vector: new THREE.Vector3(-1, 1, 1), face: 8 },
         { vector: new THREE.Vector3(-1, 1, -1), face: 2 },
         { vector: new THREE.Vector3(-1, -1, 1), face: 5 },
-        { vector: new THREE.Vector3(-1, -1, -1), face: 8 },
+        { vector: new THREE.Vector3(-1, -1, -1), face: 7`` },
         { vector: new THREE.Vector3(0, phi, 1/phi), face: 9 },
         { vector: new THREE.Vector3(0, phi, -1/phi), face: 10 },
         { vector: new THREE.Vector3(0, -phi, 1/phi), face: 3 },

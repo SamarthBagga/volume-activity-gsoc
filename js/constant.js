@@ -47,7 +47,7 @@ constant.timerUpdateNetwork = 1000;
 constant.timerBeforeTutorial = 500;
 constant.webAppType = 0; // thinClientType
 constant.appType = 1;  // clientType
-constant.noServerMode = false;
+constant.noServerMode = true;
 constant.noSignupMode = false;
 constant.noLoginMode = false;
 
