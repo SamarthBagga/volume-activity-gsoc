@@ -56,7 +56,7 @@ body {
   background-size: calc(100% - 10px) calc(100% - 10px); /* Adjust the values as needed */
 }
 #volume-button {
-  background-image: url(../icons/cube_solid.svg);
+  background-image: url(../icons/default_volume.svg);
   outline: none;
   background-size: calc(100% - 10px) calc(100% - 10px); /* Adjust the values as needed */
 
