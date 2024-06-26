@@ -33,7 +33,9 @@ define([
     );
     paletteBg.setBackgroundChangeCallback(changeBoardBackgroundHelper);
     function changeBoardBackgroundHelper(selectedBoard) {
+      console.log("changing background from base func")
       if (presence) {
+        console.log("presence is true sending message now")
         presence.sendMessage(presence.getSharedInfo().id, {
           user: presence.getUserInfo(),
           action: "changeBg",
@@ -115,6 +117,7 @@ define([
         throwDice();
       }
       if (msg.action == "changeBg") {
+        console.log("changeBG is the action now");
         changeBoardBackground(msg.content);
       }
       if (msg.action == "resetScore") {
@@ -2773,6 +2776,8 @@ define([
     // }
 
     function changeBoardBackground(selectedBoard) {
+      console.log("changing bg now")
+      console.log(selectedBoard)
       let textureLoader = new THREE.TextureLoader();
       switch (selectedBoard) {
         case "green-board":
