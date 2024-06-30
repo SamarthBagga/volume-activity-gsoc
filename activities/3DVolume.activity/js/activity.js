@@ -2501,11 +2501,11 @@ define([
         },
         {
           vector: new THREE.Vector3(-1, 0, 0), // Along the negative x-axis
-          face: 5,
+          face: 6,
         },
         {
           vector: new THREE.Vector3(0, 1, 0), // Along the positive y-axis
-          face: 6,
+          face: 5,
         },
         {
           vector: new THREE.Vector3(0, -1, 0), // Along the negative y-axis
