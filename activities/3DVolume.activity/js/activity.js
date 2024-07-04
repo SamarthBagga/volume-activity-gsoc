@@ -1407,12 +1407,12 @@ define([
 				friction: -1,
 				restitution: 5,
 			});
-			if (tempShowNumbers) {
-				tetrahedronBody.addEventListener("sleep", () => {
-					sleepCounter++;
-					getTetraScore(tetrahedron);
-				});
-			}
+			// if (tempShowNumbers) {
+			// 	tetrahedronBody.addEventListener("sleep", () => {
+			// 		sleepCounter++;
+			// 		getTetraScore(tetrahedron);
+			// 	});
+			// }
 			world.addBody(tetrahedronBody);
 			tetrahedronBody.angularVelocity.set(0.5, 0.5, 0.5);
 			tetrahedronBody.applyImpulse(offset, rollingForce);
@@ -1547,7 +1547,7 @@ define([
 			octahedron.castShadow = true;
 			scene.add(octahedron);
 
-			const scaleFactor = 1; // Change this value to scale the shape (e.g., 2 for doubling the size)
+			const scaleFactor = 0.8; // Change this value to scale the shape (e.g., 2 for doubling the size)
 
 			const verticesOcta = [
 				new CANNON.Vec3(2 * scaleFactor, 0, 0), // Vertex 1 (right)
@@ -1586,13 +1586,33 @@ define([
 				friction: -1,
 				restitution: 5,
 			});
-			if (tempShowNumbers) {
-				octahedronBody.addEventListener("sleep", () => {
-					sleepCounter++;
-					getOctaScore(octahedron);
-				});
-			}
+
+			let previousSleepState = 1;
+
+			// const octahedronBody = new Proxy(octahedronBody, {
+			// 	set(target, property, value) {
+			// 		if (
+			// 			property === "sleepState" &&
+			// 			previousSleepState === 2 &&
+			// 			value === 1
+			// 		) {
+			// 			onSleepStateChangeToOne(octahedron);
+			// 		}
+			// 		target[property] = value;
+			// 		return true;
+			// 	},
+			// });
+
 			world.addBody(octahedronBody);
+
+			// if (tempShowNumbers) {
+			// 	octahedronBody.addEventListener("sleep", () => {
+			// 		previousSleepState = 2;
+			// 		console.log(octahedronBody.sleepState);
+			// 		sleepCounter++;
+			// 		getOctaScore(octahedron);
+			// 	});
+			// }
 
 			octahedronBody.angularVelocity.set(0.5, 0.5, 0.5);
 			octahedronBody.applyImpulse(offset, rollingForce);
@@ -1634,6 +1654,7 @@ define([
 				sharedColor != null ? sharedColor : presentColor;
 			let tempTextColor =
 				sharedTextColor != null ? sharedTextColor : textColor;
+
 			if (tempShowNumbers) {
 				let tileDimension = new THREE.Vector2(4, 2);
 				let tileSize = 512;
@@ -1684,8 +1705,6 @@ define([
 
 				let m = new THREE.MeshPhongMaterial({
 					map: tex,
-					// metalness: 0.75,
-					// roughness: 0.25,
 				});
 
 				boxMesh = new THREE.Mesh(g, m);
@@ -1709,10 +1728,8 @@ define([
 					sharedImageData != null ? sharedImageData : imageData
 				);
 
-				// Create material using the texture
 				const material = new THREE.MeshPhongMaterial({ map: texture });
 
-				// Create cube mesh with the material
 				boxMesh = new THREE.Mesh(boxGeo, material);
 			} else {
 				const boxGeo = new THREE.BoxGeometry(2, 2, 2);
@@ -1740,19 +1757,36 @@ define([
 				restitution: 5,
 			});
 
+			let previousSleepState = 1;
+
+			// const boxBody = new Proxy(boxBody, {
+			// 	set(target, property, value) {
+			// 		if (
+			// 			property === "sleepState" &&
+			// 			previousSleepState === 2 &&
+			// 			value === 1
+			// 		) {
+			// 			onSleepStateChangeToOne(boxMesh);
+			// 		}
+			// 		// previousSleepState = target[property]; // update previous state
+			// 		target[property] = value;
+			// 		return true;
+			// 	},
+			// });
+
 			world.addBody(boxBody);
 
-			if (tempShowNumbers) {
-				boxBody.addEventListener("sleep", () => {
-					sleepCounter++;
-					getCubeScore(boxMesh);
-				});
-			}
+			// if (tempShowNumbers) {
+			// 	boxBody.addEventListener("sleep", () => {
+			// 		previousSleepState = 2;
+			// 		console.log(boxBody.sleepState);
+			// 		sleepCounter++;
+			// 		getCubeScore(boxMesh);
+			// 	});
+			// }
 
 			boxBody.angularVelocity.set(0.5, 0.5, 0.5);
 			boxBody.applyImpulse(offset, rollingForce);
-
-			// what will happen when the two bodies touch
 
 			const groundBoxContactMat = new CANNON.ContactMaterial(
 				groundPhysMat,
@@ -1773,7 +1807,29 @@ define([
 				tempTransparent,
 				tempFillColor,
 				tempTextColor,
+				"0",
 			]);
+		}
+
+		function onSleepStateChangeToOne(body) {
+			let score;
+			for (let i = 0; i < diceArray.length; i++) {
+				if (diceArray[i][0] == body) {
+					score = diceArray[i][7];
+					let scoresArray = lastRoll.split(" + ");
+
+					// Find the index of the first occurrence of the score to remove
+					let indexToRemove = scoresArray.indexOf(score.toString());
+
+					// If the score is found, remove it
+					if (indexToRemove !== -1) {
+						scoresArray.splice(indexToRemove, 1);
+					}
+
+					// Join the remaining scores back into a string
+					lastRoll = scoresArray.join(" + ");
+				}
+			}
 		}
 
 		const cannonDebugger = new CannonDebugger(scene, world, {
@@ -1984,12 +2040,12 @@ define([
 				friction: -1,
 				restitution: 5,
 			});
-			if (tempShowNumbers) {
-				decahedronBody.addEventListener("sleep", () => {
-					sleepCounter++;
-					getDecaScore(decahedron);
-				});
-			}
+			// if (tempShowNumbers) {
+			// 	decahedronBody.addEventListener("sleep", () => {
+			// 		sleepCounter++;
+			// 		getDecaScore(decahedron);
+			// 	});
+			// }
 			world.addBody(decahedronBody);
 			decahedronBody.angularVelocity.set(0.5, 0.5, 0.5);
 			decahedronBody.applyImpulse(offset, rollingForce);
@@ -2272,15 +2328,15 @@ define([
 				friction: -1,
 				restitution: 5,
 			});
-			dodecahedronBody.sleepSpeedLimit = 0.5;
+			dodecahedronBody.sleepSpeedLimit = 0.2;
 			dodecahedronBody.sleepTimeLimit = 3;
 			console.log(dodecahedronBody);
-			if (tempShowNumbers) {
-				dodecahedronBody.addEventListener("sleep", () => {
-					sleepCounter++;
-					getDodecaScore(dodecahedron);
-				});
-			}
+			// if (tempShowNumbers) {
+			// 	dodecahedronBody.addEventListener("sleep", () => {
+			// 		sleepCounter++;
+			// 		getDodecaScore(dodecahedron);
+			// 	});
+			// }
 			world.addBody(dodecahedronBody);
 			dodecahedronBody.angularVelocity.set(0.5, 0.5, 0.5);
 			dodecahedronBody.applyImpulse(offset, rollingForce);
@@ -2486,13 +2542,13 @@ define([
 			icosahedronBody.sleepSpeedLimit = 0.5;
 			icosahedronBody.sleepTimeLimit = 3;
 
-			if (tempShowNumbers) {
-				icosahedronBody.addEventListener("sleep", () => {
-					console.log("icosa going to sleeep");
-					sleepCounter++;
-					getIcosaScore(icosahedron);
-				});
-			}
+			// if (tempShowNumbers) {
+			// 	icosahedronBody.addEventListener("sleep", () => {
+			// 		console.log("icosa going to sleeep");
+			// 		sleepCounter++;
+			// 		getIcosaScore(icosahedron);
+			// 	});
+			// }
 			world.addBody(icosahedronBody);
 			icosahedronBody.angularVelocity.set(0.5, 0.5, 0.5);
 			icosahedronBody.applyImpulse(offset, rollingForce);
@@ -2600,22 +2656,20 @@ define([
 			for (let i = 0; i < faceVectors.length; i++) {
 				let faceVector = faceVectors[i];
 				faceVector.vector.applyEuler(body.rotation);
-				console.log(Math.abs(faceVector.vector.y));
 				if (minValue > Math.abs(1 - faceVector.vector.y)) {
 					minValue = Math.abs(1 - faceVector.vector.y);
 					minInd = i;
 				}
-				// if (Math.abs(faceVector.vector.y).toString().substring(0, 1) == '1') {
-				//   lastRoll += faceVectors[i].face + ' +'
-				//   presentScore += faceVectors[i].face
-				//   updateElements()
-				//   break
-				// }
 			}
 			if (!ifRemove) {
 				lastRoll += faceVectors[minInd].face + " + ";
 				presentScore += faceVectors[minInd].face;
 				updateElements();
+			}
+			for (let i = 0; i < diceArray.length; i++) {
+				if (body == diceArray[i][0]) {
+					diceArray[i][7] = faceVectors[minInd].face;
+				}
 			}
 			return faceVectors[minInd].face;
 		}
@@ -2655,6 +2709,11 @@ define([
 						presentScore += faceVector.face;
 						updateElements();
 					}
+					for (let i = 0; i < diceArray.length; i++) {
+						if (body == diceArray[i][0]) {
+							diceArray[i][7] = faceVector.face;
+						}
+					}
 					return faceVector.face;
 				}
 			}
@@ -2687,6 +2746,11 @@ define([
 						presentScore += faceVector.face;
 						updateElements();
 						break;
+					}
+					for (let i = 0; i < diceArray.length; i++) {
+						if (body == diceArray[i][0]) {
+							diceArray[i][7] = faceVector.face;
+						}
 					}
 					return faceVector.face;
 				}
@@ -2784,6 +2848,16 @@ define([
 					presentScore += faceNumber;
 					updateElements();
 				}
+				for (let i = 0; i < diceArray.length; i++) {
+					if (body == diceArray[i][0]) {
+						diceArray[i][7] = faceNumber;
+					}
+				}
+				for (let i = 0; i < diceArray.length; i++) {
+					if (body == diceArray[i][0]) {
+						diceArray[i][7] = faceNumber;
+					}
+				}
 				return faceNumber;
 			}
 		}
@@ -2826,6 +2900,11 @@ define([
 						presentScore += faceVector.face;
 						updateElements();
 						break;
+					}
+					for (let i = 0; i < diceArray.length; i++) {
+						if (body == diceArray[i][0]) {
+							diceArray[i][7] = faceVector.face;
+						}
 					}
 					return faceVector.face;
 				}
@@ -2899,6 +2978,42 @@ define([
 					break;
 			}
 		}
+
+		function getScores() {
+			presentScore = 0;
+			lastRoll = "";
+			lastRollElement.textContent = "";
+
+			for (let i = 0; i < diceArray.length; i++) {
+				if (diceArray[i][3]) {
+					switch (diceArray[i][2]) {
+						case "cube":
+							score = getCubeScore(diceArray[i][0]);
+							break;
+						case "icosa":
+							score = getIcosaScore(diceArray[i][0]);
+							break;
+						case "deca":
+							score = getDecaScore(diceArray[i][0]);
+							break;
+						case "dodeca":
+							score = getDodecaScore(diceArray[i][0]);
+							break;
+						case "octa":
+							score = getOctaScore(diceArray[i][0]);
+							break;
+						case "tetra":
+							score = getTetraScore(diceArray[i][0]);
+							break;
+						default:
+							console.log(`Unknown type: ${diceArray[i][3]}`);
+							continue;
+					}
+				}
+			}
+		}
+
+		let awake = false;
 		animate();
 
 		function animate() {
@@ -2912,6 +3027,14 @@ define([
 			for (let i = 0; i < diceArray.length; i++) {
 				diceArray[i][0]?.position?.copy(diceArray[i][1].position);
 				diceArray[i][0]?.quaternion?.copy(diceArray[i][1].quaternion);
+			}
+			if (world.hasActiveBodies == false && awake == true) {
+				awake = false;
+				console.log("the world is going to sleep now bye bye");
+				getScores();
+			}
+			if (world.hasActiveBodies == true) {
+				awake = true;
 			}
 
 			renderer.render(scene, camera);
