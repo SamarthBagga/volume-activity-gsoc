@@ -1081,6 +1081,10 @@ define([
 		var sensorButton = document.getElementById("sensor-button");
 		var sensorMode = false;
 		var readyToWatch = false;
+		console.log(useragent.indexOf('android'))
+		if (useragent.indexOf('android') != -1) {
+			alert("IT IS WORKING")
+		}
 
 		// if (useragent.indexOf('android') != -1 || useragent.indexOf('iphone') != -1 || useragent.indexOf('ipad') != -1 || useragent.indexOf('ipod') != -1 || useragent.indexOf('mozilla/5.0 (mobile') != -1) {
 		// 	document.addEventListener('deviceready', function() {
