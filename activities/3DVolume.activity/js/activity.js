@@ -1082,14 +1082,29 @@ define([
 		var sensorMode = false;
 		var readyToWatch = false;
 
-		if (useragent.indexOf('android') != -1 || useragent.indexOf('iphone') != -1 || useragent.indexOf('ipad') != -1 || useragent.indexOf('ipod') != -1 || useragent.indexOf('mozilla/5.0 (mobile') != -1) {
-			document.addEventListener('deviceready', function() {
-				readyToWatch = true;
-			}, false);
-			sensorButton.disabled = false;
-		} else {
-			sensorButton.disabled = true;
-		}
+		// if (useragent.indexOf('android') != -1 || useragent.indexOf('iphone') != -1 || useragent.indexOf('ipad') != -1 || useragent.indexOf('ipod') != -1 || useragent.indexOf('mozilla/5.0 (mobile') != -1) {
+		// 	document.addEventListener('deviceready', function() {
+		// 		readyToWatch = true;
+		// 	}, false);
+		// 	sensorButton.disabled = false;
+		// } else {
+		// 	sensorButton.disabled = true;
+		// }
+
+		sensorButton.addEventListener("click", function () {
+			sensorMode = !sensorMode;
+			if (sensorMode) {
+				sensorButton.classList.add("active");
+							window.addEventListener('deviceorientation', function(event) {
+				if (sensorMode) {
+					handleDeviceOrientation(event);
+				}
+			}, true);
+
+			} else {
+				sensorButton.classList.remove("active");
+			}
+		});
 
 		function handleDeviceOrientation(event) {
 			var gamma = event.gamma; // Tilt left or right (range from -90 to 90)
@@ -1098,22 +1113,22 @@ define([
 			adjustGravity(gamma);
 		}
 
-		if (readyToWatch) {
-			sensorButton.disabled = false;
-			sensorButton.addEventListener("click", function () {
-				sensorMode = !sensorMode;
-				if (sensorMode) {
-					sensorButton.classList.add("active");
-				} else {
-					sensorButton.classList.remove("active");
-				}
-			});
-			window.addEventListener('deviceorientation', function(event) {
-				if (sensorMode) {
-					handleDeviceOrientation(event);
-				}
-			}, true);
-		}
+		// if (readyToWatch) {
+		// 	sensorButton.disabled = false;
+		// 	sensorButton.addEventListener("click", function () {
+		// 		sensorMode = !sensorMode;
+		// 		if (sensorMode) {
+		// 			sensorButton.classList.add("active");
+		// 		} else {
+		// 			sensorButton.classList.remove("active");
+		// 		}
+		// 	});
+		// 	window.addEventListener('deviceorientation', function(event) {
+		// 		if (sensorMode) {
+		// 			handleDeviceOrientation(event);
+		// 		}
+		// 	}, true);
+		// }
 
 		const groundGeo = new THREE.PlaneGeometry(30, 30);
 		const groundMat = new THREE.MeshPhongMaterial({
