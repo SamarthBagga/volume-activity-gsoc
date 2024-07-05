@@ -1082,22 +1082,13 @@ define([
 		var sensorMode = false;
 		var readyToWatch = false;
 
-		if (
-			useragent.indexOf("android") !== -1 ||
-			useragent.indexOf("iphone") !== -1 ||
-			useragent.indexOf("ipad") !== -1 ||
-			useragent.indexOf("ipod") !== -1 ||
-			useragent.indexOf("mozilla/5.0 (mobile") !== -1
-		) {
-			document.addEventListener(
-				"deviceready",
-				function () {
-					readyToWatch = true;
-				},
-				false
-			);
+		if (useragent.indexOf('android') != -1 || useragent.indexOf('iphone') != -1 || useragent.indexOf('ipad') != -1 || useragent.indexOf('ipod') != -1 || useragent.indexOf('mozilla/5.0 (mobile') != -1) {
+			document.addEventListener('deviceready', function() {
+				readyToWatch = true;
+			}, false);
+			sensorButton.disabled = false;
 		} else {
-			readyToWatch = true; // Assume readyToWatch is true for non-mobile devices
+			sensorButton.disabled = true;
 		}
 
 		function handleDeviceOrientation(event) {
@@ -1107,7 +1098,7 @@ define([
 			adjustGravity(gamma);
 		}
 
-		if (!readyToWatch) {
+		if (readyToWatch) {
 			sensorButton.disabled = false;
 			sensorButton.addEventListener("click", function () {
 				sensorMode = !sensorMode;
