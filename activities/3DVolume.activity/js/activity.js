@@ -1082,6 +1082,7 @@ define([
 		var sensorMode = false;
 		var readyToWatch = false;
 		console.log(useragent.indexOf('android'))
+		alert("but thsi is working")
 		if (useragent.indexOf('android') != -1) {
 			window.alert("IT IS WORKING")
 		}
