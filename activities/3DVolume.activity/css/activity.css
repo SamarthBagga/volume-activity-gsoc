@@ -101,6 +101,14 @@ body {
   background-image: url(../icons/throw.svg);
   outline: none;
 }
+#sensor-button {
+  height: 45px;
+  width: 45xpx;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-image: url(../icons/sensor.svg);
+  outline: none;
+}
 #transparent-button {
   margin: 0;
   padding: 0;
