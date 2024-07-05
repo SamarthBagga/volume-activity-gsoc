@@ -267,7 +267,7 @@ define([
 						diceArray[i][3],
 						diceArray[i][4],
 						diceArray[i][7],
-						diceArray[i][8]
+						diceArray[i][8],
 					]);
 				}
 				console.log("writing...");
@@ -812,7 +812,7 @@ define([
 
 						if (createFunction) {
 							let angVel1 = Math.random() * (1 - 0.1) + 0.1;
-							let angVel2 = Math.random() * (1 - 0.1) + 0.1 ;
+							let angVel2 = Math.random() * (1 - 0.1) + 0.1;
 							createFunction(
 								null,
 								null,
@@ -851,8 +851,8 @@ define([
 											yCoordinateShared: null,
 											quaternionShared: null,
 											sharedTextColor: ctx.textColor,
-											sharedAngVel1 : angVel1,
-											sharedAngVel2 : angVel2
+											sharedAngVel1: angVel1,
+											sharedAngVel2: angVel2,
 										},
 									}
 								);
@@ -994,7 +994,7 @@ define([
 					diceArray[i][3],
 					diceArray[i][4],
 					diceArray[i][7],
-					diceArray[i][8]
+					diceArray[i][8],
 				]);
 			}
 			presence.sendMessage(presence.getSharedInfo().id, {
@@ -1064,6 +1064,65 @@ define([
 			gravity: new CANNON.Vec3(0, -9.81, 0),
 		});
 		world.allowSleep = true;
+
+		function adjustGravity(gamma) {
+			console.log("adjusting gravity")
+			var gravityStrength = 9.82; // Earth's gravity in m/s^2
+			var maxTilt = 90; // Maximum tilt value
+
+			// Map the gamma value to the gravity direction
+			var gravityX = (gamma / maxTilt) * gravityStrength;
+
+			// Set the new gravity vector
+			world.gravity.set(gravityX, -gravityStrength, 0);
+		}
+
+		var useragent = navigator.userAgent.toLowerCase();
+		var sensorButton = document.getElementById("sensor-button");
+		var sensorMode = false;
+		var readyToWatch = false;
+
+		if (
+			useragent.indexOf("android") !== -1 ||
+			useragent.indexOf("iphone") !== -1 ||
+			useragent.indexOf("ipad") !== -1 ||
+			useragent.indexOf("ipod") !== -1 ||
+			useragent.indexOf("mozilla/5.0 (mobile") !== -1
+		) {
+			document.addEventListener(
+				"deviceready",
+				function () {
+					readyToWatch = true;
+				},
+				false
+			);
+		} else {
+			readyToWatch = true; // Assume readyToWatch is true for non-mobile devices
+		}
+
+		function handleDeviceOrientation(event) {
+			var gamma = event.gamma; // Tilt left or right (range from -90 to 90)
+		
+			// Adjust gravity based on tilt
+			adjustGravity(gamma);
+		}
+
+		if (!readyToWatch) {
+			sensorButton.disabled = false;
+			sensorButton.addEventListener("click", function () {
+				sensorMode = !sensorMode;
+				if (sensorMode) {
+					sensorButton.classList.add("active");
+				} else {
+					sensorButton.classList.remove("active");
+				}
+			});
+			window.addEventListener('deviceorientation', function(event) {
+				if (sensorMode) {
+					handleDeviceOrientation(event);
+				}
+			}, true);
+		}
 
 		const groundGeo = new THREE.PlaneGeometry(30, 30);
 		const groundMat = new THREE.MeshPhongMaterial({
@@ -1304,7 +1363,7 @@ define([
 					world.addBody(diceArray[i][1]);
 				}
 			} else {
-				console.log("what is never supposed to happen is happening :0")
+				console.log("what is never supposed to happen is happening :0");
 				for (let i = 0; i < dices.cube; i++) {
 					createCube();
 				}
