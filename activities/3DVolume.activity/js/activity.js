@@ -1100,16 +1100,42 @@ define([
 			sensorMode = !sensorMode;
 			if (sensorMode) {
 				sensorButton.classList.add("active");
-							window.addEventListener('deviceorientation', function(event) {
+				window.addEventListener('deviceorientation', function(event) {
 				if (sensorMode) {
 					handleDeviceOrientation(event);
 				}
 			}, true);
+			console.log(screen.orientation.type); 
 
 			} else {
 				sensorButton.classList.remove("active");
+				world.gravity.set(0, -9.81, 0);
 			}
 		});
+
+		function accelerationChanged(acceleration) {
+			if (!sensorMode) return;
+			if (acceleration.x < -4.5) {
+				if (acceleration.y > 4.75)
+					setGravity(3);
+				else if (acceleration.y < -4.75)
+					setGravity(5);
+				else
+					setGravity(4);
+			} else if (acceleration.x <= 4.5 && acceleration.x >= -4.5) {
+				if (acceleration.y > 4.75)
+					setGravity(2);
+				else if (acceleration.y < -4.75)
+					setGravity(6);
+			} else if (acceleration.x > 4.5) {
+				if (acceleration.y > 4.75)
+					setGravity(1);
+				else if (acceleration.y < -4.75)
+					setGravity(7);
+				else
+					setGravity(0);
+			}
+		}
 
 		function handleDeviceOrientation(event) {
 			var gamma = event.gamma; // Tilt left or right (range from -90 to 90)
