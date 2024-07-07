@@ -195,7 +195,7 @@ function createDecahedron(
 
 	const t = (1 + Math.sqrt(5)) / 2;
 	const r = 1 / t;
-	const scaleFactor = 1.2; // Change this value to scale the shape (e.g., 2 for doubling the size)
+	const scaleFactor = 0.9; // Change this value to scale the shape (e.g., 2 for doubling the size)
 
 	const verticesCannon = [];
 	for (let i = 0; i < verticesGeo.length; i += 3) {

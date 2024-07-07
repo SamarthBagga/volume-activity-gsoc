@@ -1932,7 +1932,7 @@ define([
 
 		function animate() {
 			world.step(timeStep);
-			// cannonDebugger.update();
+			cannonDebugger.update();
 
 			groundMesh.position.copy(groundBody.position);
 			groundMesh.quaternion.copy(groundBody.quaternion);
