@@ -1138,20 +1138,22 @@ define([
 				world.gravity.set(0, -9.81, 0);
 			}
 		});
+		if (sensorMode) {
+			watchId = navigator.accelerometer.watchAcceleration(accelerationChanged, null, { frequency: 500 });
+		}
 
-		function accelerationChanged(acceleration) {
-			if (!sensorMode) return;
-			if (acceleration.x < -4.5) {
-				if (acceleration.y > 4.75) setGravity(3);
-				else if (acceleration.y < -4.75) setGravity(5);
-				else setGravity(4);
-			} else if (acceleration.x <= 4.5 && acceleration.x >= -4.5) {
-				if (acceleration.y > 4.75) setGravity(2);
-				else if (acceleration.y < -4.75) setGravity(6);
-			} else if (acceleration.x > 4.5) {
-				if (acceleration.y > 4.75) setGravity(1);
-				else if (acceleration.y < -4.75) setGravity(7);
-				else setGravity(0);
+		function setGravity(acceleration) {
+			// Set the gravity vector based on the acceleration
+			world.gravity.set(acceleration.x, acceleration.y, acceleration.z);
+		}
+		
+		function accelerationChanged(event) {
+			// Get the acceleration including gravity
+			const acceleration = event.accelerationIncludingGravity;
+		
+			// Check if the acceleration data is available
+			if (acceleration) {
+				setGravity(acceleration);
 			}
 		}
 
@@ -1161,6 +1163,7 @@ define([
 			// Adjust gravity based on tilt
 			adjustGravity(gamma);
 		}
+
 
 		// if (readyToWatch) {
 		// 	sensorButton.disabled = false;
