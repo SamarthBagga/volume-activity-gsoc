@@ -1146,12 +1146,12 @@ define([
 			// Set the gravity vector based on the acceleration
 			world.gravity.set(acceleration.x, acceleration.y, acceleration.z);
 		}
-		alert("changes made 1")
+		alert("changes made 2")
 		
 		function accelerationChanged(event) {
 			// Get the acceleration including gravity
 			const acceleration = event.accelerationIncludingGravity;
-			window.alert(acceleration);
+			alert(acceleration);
 			// Check if the acceleration data is available
 			if (acceleration) {
 				setGravity(acceleration);
