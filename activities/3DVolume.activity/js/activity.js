@@ -1,11 +1,11 @@
 define([
 	"sugar-web/activity/activity",
 	"sugar-web/env",
-	"./palettes/bgpalette",
-	"./palettes/volumepalette",
-	"./palettes/colorpalettefill",
-	"./palettes/colorpalettetext",
-	"./palettes/zoompalette",
+	"activity/palettes/bgpalette",
+	"activity/palettes/volumepalette",
+	"activity/palettes/colorpalettefill",
+	"activity/palettes/colorpalettetext",
+	"activity/palettes/zoompalette",
 	"sugar-web/graphics/presencepalette",
 	"tutorial",
 	"sugar-web/graphics/journalchooser",
@@ -51,15 +51,29 @@ define([
 			document.getElementById("zoom-button"),
 			undefined
 		);
-		var paletteColorFill = new colorpaletteFill.ColorPalette(
-			document.getElementById("color-button-fill"),
-			undefined
-		);
 
-		var paletteColorText = new colorpaletteText.ColorPalette(
-			document.getElementById("color-button-text"),
-			undefined
-		);
+		// Full screen
+		document
+			.getElementById("fullscreen-button")
+			.addEventListener("click", function () {
+				document.getElementById("main-toolbar").style.visibility =
+					"hidden";
+				document.getElementById("game-container").style.top = "0px";
+				document.getElementById(
+					"unfullscreen-button"
+				).style.visibility = "visible";
+			});
+		document
+			.getElementById("unfullscreen-button")
+			.addEventListener("click", function () {
+				document.getElementById("main-toolbar").style.visibility =
+					"visible";
+				document.getElementById("game-container").style.top = "55px";
+				document.getElementById(
+					"unfullscreen-button"
+				).style.visibility = "hidden";
+
+			});
 
 		const randomDirection = new CANNON.Vec3(
 			0.3, // Random x-axis value between -0.5 and 0.5
@@ -76,7 +90,7 @@ define([
 			offset: new CANNON.Vec3(0, 0.1, 0),
 			rollingForce: randomDirection.scale(2),
 		};
-
+		let presentBackground = null;
 		let presentScore = 0;
 		let lastRoll = "";
 		let diceArray = [];
@@ -125,12 +139,25 @@ define([
 			}
 		});
 
+		var paletteColorFill = new colorpaletteFill.ColorPalette(
+			document.getElementById("color-button-fill"),
+			undefined,
+			ctx
+		);
+
+		var paletteColorText = new colorpaletteText.ColorPalette(
+			document.getElementById("color-button-text"),
+			undefined,
+			ctx
+		);
+
 		var onNetworkDataReceived = function (msg) {
 			if (presence.getUserInfo().networkId === msg.user.networkId) {
 				return;
 			}
 			if (msg.action == "init") {
-				data = msg.content;
+				changeBoardBackground(msg.content[1]);
+				data = msg.content[0];
 				console.log(data);
 				for (let i = 0; i < data.length; i++) {
 					let createFunction = null;
@@ -1000,7 +1027,7 @@ define([
 			presence.sendMessage(presence.getSharedInfo().id, {
 				user: presence.getUserInfo(),
 				action: "init",
-				content: presenceDiceArray,
+				content: [presenceDiceArray, presentBackground],
 			});
 		};
 
@@ -1066,7 +1093,7 @@ define([
 		world.allowSleep = true;
 
 		function adjustGravity(gamma) {
-			console.log("adjusting gravity")
+			console.log("adjusting gravity");
 			var gravityStrength = 9.82; // Earth's gravity in m/s^2
 			var maxTilt = 90; // Maximum tilt value
 
@@ -1081,11 +1108,7 @@ define([
 		var sensorButton = document.getElementById("sensor-button");
 		var sensorMode = false;
 		var readyToWatch = false;
-		console.log(useragent.indexOf('android'))
-		alert("but thsi is working")
-		if (useragent.indexOf('android') != -1) {
-			window.alert("IT IS WORKING")
-		}
+		console.log(useragent.indexOf("android"));
 
 		// if (useragent.indexOf('android') != -1 || useragent.indexOf('iphone') != -1 || useragent.indexOf('ipad') != -1 || useragent.indexOf('ipod') != -1 || useragent.indexOf('mozilla/5.0 (mobile') != -1) {
 		// 	document.addEventListener('deviceready', function() {
@@ -1100,13 +1123,16 @@ define([
 			sensorMode = !sensorMode;
 			if (sensorMode) {
 				sensorButton.classList.add("active");
-				window.addEventListener('deviceorientation', function(event) {
-				if (sensorMode) {
-					handleDeviceOrientation(event);
-				}
-			}, true);
-			console.log(screen.orientation.type); 
-
+				window.addEventListener(
+					"deviceorientation",
+					function (event) {
+						if (sensorMode) {
+							handleDeviceOrientation(event);
+						}
+					},
+					true
+				);
+				console.log(screen.orientation.type);
 			} else {
 				sensorButton.classList.remove("active");
 				world.gravity.set(0, -9.81, 0);
@@ -1116,30 +1142,22 @@ define([
 		function accelerationChanged(acceleration) {
 			if (!sensorMode) return;
 			if (acceleration.x < -4.5) {
-				if (acceleration.y > 4.75)
-					setGravity(3);
-				else if (acceleration.y < -4.75)
-					setGravity(5);
-				else
-					setGravity(4);
+				if (acceleration.y > 4.75) setGravity(3);
+				else if (acceleration.y < -4.75) setGravity(5);
+				else setGravity(4);
 			} else if (acceleration.x <= 4.5 && acceleration.x >= -4.5) {
-				if (acceleration.y > 4.75)
-					setGravity(2);
-				else if (acceleration.y < -4.75)
-					setGravity(6);
+				if (acceleration.y > 4.75) setGravity(2);
+				else if (acceleration.y < -4.75) setGravity(6);
 			} else if (acceleration.x > 4.5) {
-				if (acceleration.y > 4.75)
-					setGravity(1);
-				else if (acceleration.y < -4.75)
-					setGravity(7);
-				else
-					setGravity(0);
+				if (acceleration.y > 4.75) setGravity(1);
+				else if (acceleration.y < -4.75) setGravity(7);
+				else setGravity(0);
 			}
 		}
 
 		function handleDeviceOrientation(event) {
 			var gamma = event.gamma; // Tilt left or right (range from -90 to 90)
-		
+
 			// Adjust gravity based on tilt
 			adjustGravity(gamma);
 		}
@@ -1752,6 +1770,7 @@ define([
 		function changeBoardBackground(selectedBoard) {
 			console.log("changing bg now");
 			console.log(selectedBoard);
+			presentBackground = selectedBoard;
 			let textureLoader = new THREE.TextureLoader();
 			switch (selectedBoard) {
 				case "green-board":

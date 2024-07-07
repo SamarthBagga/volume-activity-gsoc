@@ -239,7 +239,6 @@ function createDodecahedron(
 	});
 	dodecahedronBody.sleepSpeedLimit = 0.2;
 	dodecahedronBody.sleepTimeLimit = 3;
-	console.log(dodecahedronBody);
 	// if (tempShowNumbers) {
 	// 	dodecahedronBody.addEventListener("sleep", () => {
 	// 		sleepCounter++;
