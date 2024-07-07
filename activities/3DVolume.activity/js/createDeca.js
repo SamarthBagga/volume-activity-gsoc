@@ -93,8 +93,12 @@ function createDecahedron(
 		[1, 11, 10],
 		[1, 2, 11],
 	].flat();
-    const decaGeometry = new THREE.PolyhedronGeometry(verticesGeo, facesGeo, 1.3, 0);
-
+	const decaGeometry = new THREE.PolyhedronGeometry(
+		verticesGeo,
+		facesGeo,
+		1.3,
+		0
+	);
 
 	if (tempShowNumbers) {
 		let vertStep = THREE.MathUtils.degToRad(36);
@@ -145,7 +149,7 @@ function createDecahedron(
 		let g = BufferGeometryUtils.mergeBufferGeometries(gs);
 
 		let m = new THREE.MeshLambertMaterial({
-			map: getNumbers(),
+			map: getNumbers(tempFillColor, tempTextColor),
 		});
 
 		decahedron = new THREE.Mesh(g, m);
@@ -278,7 +282,7 @@ function recomputeUVs(g, idx) {
 	}
 }
 
-function getNumbers() {
+function getNumbers(tempFillColor, tempTextColor) {
 	let tileSize = 256;
 	let tiles = {
 		x: 4,
@@ -291,13 +295,13 @@ function getNumbers() {
 	c.height = tileSize * 4;
 	let u = (val) => tileSize * 0.01 * val;
 
-	ctx.fillStyle = "rgba(0, 127, 255, 1)";
+	ctx.fillStyle = tempFillColor;
 	ctx.fillRect(0, 0, c.width, c.height);
 
 	ctx.font = `bold ${u(40)}px Arial`;
 	ctx.textAlign = "center";
 	ctx.textBaseline = "middle";
-	ctx.fillStyle = "#f80";
+	ctx.fillStyle = tempTextColor;
 
 	for (let i = 0; i < sides; i++) {
 		let y = Math.floor(i / tiles.x);
