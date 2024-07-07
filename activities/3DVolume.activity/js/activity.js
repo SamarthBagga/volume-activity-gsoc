@@ -1123,38 +1123,89 @@ define([
 			sensorMode = !sensorMode;
 			if (sensorMode) {
 				sensorButton.classList.add("active");
-				window.addEventListener(
-					"deviceorientation",
-					function (event) {
-						if (sensorMode) {
-							handleDeviceOrientation(event);
-						}
-					},
-					true
-				);
+				// window.addEventListener(
+				// 	"deviceorientation",
+				// 	function (event) {
+				// 		if (sensorMode) {
+				// 			handleDeviceOrientation(event);
+				// 		}
+				// 	},
+				// 	true
+				// );
+				watchId = navigator.accelerometer.watchAcceleration(accelerationChanged, null, { frequency: 500 });
+				
 				console.log(screen.orientation.type);
 			} else {
 				sensorButton.classList.remove("active");
 				world.gravity.set(0, -9.81, 0);
 			}
 		});
-		if (sensorMode) {
-			watchId = navigator.accelerometer.watchAcceleration(accelerationChanged, null, { frequency: 500 });
-		}
-
-		function setGravity(acceleration) {
-			// Set the gravity vector based on the acceleration
-			world.gravity.set(acceleration.x, acceleration.y, acceleration.z);
-		}
-		alert("changes made 2")
 		
-		function accelerationChanged(event) {
-			// Get the acceleration including gravity
-			const acceleration = event.accelerationIncludingGravity;
-			alert(acceleration);
-			// Check if the acceleration data is available
-			if (acceleration) {
-				setGravity(acceleration);
+
+		function setGravity(gravityDirection) {
+			let gravityX = 0;
+			let gravityY = 0;
+			let gravityZ = 0;
+		
+			switch (gravityDirection) {
+				case 0:
+					gravityX = 1; // Right
+					break;
+				case 1:
+					gravityX = -1; // Right-bottom (diagonal down-right)
+					gravityY = -1;
+					break;
+				case 2:
+					gravityY = -1; // Bottom (straight down)
+					break;
+				case 3:
+					gravityX = -1; // Left-bottom (diagonal down-left)
+					gravityY = 1;
+					break;
+				case 4:
+					gravityX = -1; // Left (straight left)
+					break;
+				case 5:
+					gravityX = -1; // Left-top (diagonal up-left)
+					gravityY = -1;
+					break;
+				case 6:
+					gravityY = 1; // Top (straight up)
+					break;
+				case 7:
+					gravityX = 1; // Right-top (diagonal up-right)
+					gravityY = 1;
+					break;
+				default:
+					break;
+			}
+		
+			// Assuming you have a Cannon.js world instance called 'world'
+			world.gravity.set(gravityX * 9.82, gravityY * 9.82, gravityZ * 9.82); // Scale gravity with 9.82 m/s² (approximate Earth gravity)
+		}
+		
+		
+		function accelerationChanged(acceleration) {
+			if (!sensorMode) return;
+			if (acceleration.x < -4.5) {
+				if (acceleration.y > 4.75)
+					setGravity(3);
+				else if (acceleration.y < -4.75)
+					setGravity(5);
+				else
+					setGravity(4);
+			} else if (acceleration.x <= 4.5 && acceleration.x >= -4.5) {
+				if (acceleration.y > 4.75)
+					setGravity(2);
+				else if (acceleration.y < -4.75)
+					setGravity(6);
+			} else if (acceleration.x > 4.5) {
+				if (acceleration.y > 4.75)
+					setGravity(1);
+				else if (acceleration.y < -4.75)
+					setGravity(7);
+				else
+					setGravity(0);
 			}
 		}
 
@@ -1590,8 +1641,41 @@ define([
 		}
 
 		function getDecaScore(body, ifRemove) {
-			console.log("getting deca");
+            // Define face vectors based on vertices
+            const faceVectors = [
+                { vector: new THREE.Vector3(0, 0, 1), face: 1 },
+                { vector: new THREE.Vector3(0, 0, -1), face: 2 },
+            ];
+
+            const sides = 10;
+            for (let i = 0; i < sides; ++i) {
+                const b = (i * Math.PI * 2) / sides;
+                faceVectors.push({
+                    vector: new THREE.Vector3(-Math.cos(b), -Math.sin(b), 0.105 * (i % 2 ? 1 : -1)),
+                    face: i + 3,
+                });
+            }
+
+            for (const faceVector of faceVectors) {
+                faceVector.vector.normalize().applyEuler(body.rotation);
+
+                if (Math.round(faceVector.vector.y) === 1) {
+                    if (!ifRemove) {
+                        lastRoll += faceVector.face + " + ";
+                        presentScore += faceVector.face;
+                        updateElements();
+                        break;
+                    }
+                    for (let i = 0; i < diceArray.length; i++) {
+                        if (body == diceArray[i][0]) {
+                            diceArray[i][7] = faceVector.face;
+                        }
+                    }
+                    return faceVector.face;
+                }
+            }
 		}
+
 
 		function getIcosaScore(body, ifRemove) {
 			// Define the golden ratio
@@ -1703,29 +1787,27 @@ define([
 			);
 		}
 
-		function getDodecaScore(body, ifRemove) {
+		function getDecaScore(body, ifRemove) {
 			// Define the golden ratio
 			const phi = (1 + Math.sqrt(5)) / 2;
-
-			// Dodecahedron face vectors
+		
+			// Decahedron face vectors
 			const faceVectors = [
-				{ vector: new THREE.Vector3(1, 1, 1), face: 1 },
-				{ vector: new THREE.Vector3(1, 1, -1), face: 6 },
-				{ vector: new THREE.Vector3(1, -1, 1), face: 11 },
-				{ vector: new THREE.Vector3(1, -1, -1), face: 4 },
-				{ vector: new THREE.Vector3(-1, 1, 1), face: 7 },
-				{ vector: new THREE.Vector3(-1, 1, -1), face: 2 },
-				{ vector: new THREE.Vector3(-1, -1, 1), face: 5 },
-				{ vector: new THREE.Vector3(-1, -1, -1), face: 8 },
-				{ vector: new THREE.Vector3(0, phi, 1 / phi), face: 9 },
-				{ vector: new THREE.Vector3(0, phi, -1 / phi), face: 10 },
-				{ vector: new THREE.Vector3(0, -phi, 1 / phi), face: 3 },
-				{ vector: new THREE.Vector3(0, -phi, -1 / phi), face: 12 },
+				{ vector: new THREE.Vector3(0, 1, phi), face: 1 },
+				{ vector: new THREE.Vector3(0, 1, -phi), face: 2 },
+				{ vector: new THREE.Vector3(0, -1, phi), face: 3 },
+				{ vector: new THREE.Vector3(0, -1, -phi), face: 8 },
+				{ vector: new THREE.Vector3(1, phi, 0), face: 5 },
+				{ vector: new THREE.Vector3(1, -phi, 0), face: 6 },
+				{ vector: new THREE.Vector3(-1, phi, 0), face: 7 },
+				{ vector: new THREE.Vector3(-1, -phi, 0), face: 4 },
+				{ vector: new THREE.Vector3(phi, 0, 1), face: 9 },
+				{ vector: new THREE.Vector3(phi, 0, -1), face: 10 },
 			];
-
+		
 			for (const faceVector of faceVectors) {
 				faceVector.vector.normalize().applyEuler(body.rotation);
-
+		
 				if (Math.round(faceVector.vector.y) === 1) {
 					if (!ifRemove) {
 						lastRoll += faceVector.face + " + ";
@@ -1742,6 +1824,7 @@ define([
 				}
 			}
 		}
+		
 
 		function toggleTransparency() {
 			for (let i = 0; i < diceArray.length; i++) {
