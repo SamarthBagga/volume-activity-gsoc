@@ -381,9 +381,13 @@ define([
 		document
 			.getElementById("help-button")
 			.addEventListener("click", function (e) {
-				tutorial.start();
+				ifAdding.adding = false;
+				tutorial.start(ifAdding);
 			});
 
+		function myFuncIn() {
+			console.log("hello hu e");
+		}
 		const redSliderFill = document.getElementById("red-slider-fill");
 		const greenSliderFill = document.getElementById("green-slider-fill");
 		const blueSliderFill = document.getElementById("blue-slider-fill");
@@ -795,7 +799,14 @@ define([
 		document.querySelector("body").addEventListener("click", onRemoveClick);
 		document.querySelector("body").addEventListener("click", onAddClick);
 
+		let ifAdding = {
+			adding: true,
+		};
+
 		function onAddClick(event) {
+			if (!ifAdding.adding) {
+				return;
+			}
 			if (window.isRotating) {
 				window.isRotating = false;
 				return;
@@ -1924,9 +1935,11 @@ define([
 			}
 		}
 		let awake = false;
+		let lastTime;
+
 		animate();
 
-		function animate() {
+		function animate(time) {
 			world.step(timeStep);
 			// cannonDebugger.update();
 
@@ -1946,7 +1959,6 @@ define([
 			if (world.hasActiveBodies == true) {
 				awake = true;
 			}
-			// accelerationChanged();
 
 			renderer.render(scene, camera);
 		}
