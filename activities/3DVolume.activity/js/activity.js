@@ -1705,7 +1705,7 @@ define([
 		function animate(time) {
 			world.step(timeStep);
 			// Uncomment the next line to view how the physical world actually looks like.
-			cannonDebugger.update();
+			// cannonDebugger.update();
 
 			groundMesh.position.copy(groundBody.position);
 			groundMesh.quaternion.copy(groundBody.quaternion);
