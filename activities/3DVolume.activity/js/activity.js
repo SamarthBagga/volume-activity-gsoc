@@ -1084,6 +1084,16 @@ define([
 
 		// We will add invisible walls to all sides of the board so that the volumes do not fly off the board.
 
+		const topWall = new CANNON.Body({
+			shape: new CANNON.Box(new CANNON.Vec3(15, 15, 0.1)),
+			type: CANNON.Body.STATIC,
+			material: groundPhysMat,
+		});
+		topWall.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
+		topWall.position.set(0, 12, 0);
+
+		world.addBody(topWall);
+
 		const leftWallBody = new CANNON.Body({
 			shape: new CANNON.Box(new CANNON.Vec3(15, 100, 0.1)),
 			type: CANNON.Body.STATIC,
@@ -1241,6 +1251,7 @@ define([
 				for (let i = 0; i < diceArray.length; i++) {
 					scene.add(diceArray[i][0]);
 					world.addBody(diceArray[i][1]);
+					diceArray[i][1].position.set(0, 10, 0);
 				}
 			}
 		}
@@ -1694,7 +1705,7 @@ define([
 		function animate(time) {
 			world.step(timeStep);
 			// Uncomment the next line to view how the physical world actually looks like.
-			// cannonDebugger.update();
+			cannonDebugger.update();
 
 			groundMesh.position.copy(groundBody.position);
 			groundMesh.quaternion.copy(groundBody.quaternion);
