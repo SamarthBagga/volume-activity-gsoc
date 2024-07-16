@@ -209,7 +209,7 @@ define([
 				}
 			}
 			if (msg.action == "throw") {
-				throwDice();
+				throwDice(msg.content[0], msg.content[1]);
 			}
 			if (msg.action == "changeBg") {
 				changeBoardBackground(msg.content);
@@ -514,6 +514,7 @@ define([
 					presence.sendMessage(presence.getSharedInfo().id, {
 						user: presence.getUserInfo(),
 						action: "throw",
+						content: [ctx.offset, ctx.rollingForce]
 					});
 				}
 			});
@@ -1239,8 +1240,7 @@ define([
 
 		// This function handles the tossing of the volumes.
 
-		function throwDice() {
-			// Remove all the volumes from the board.
+		function throwDice(sharedOffset, sharedRolling) {
 			for (let i = 0; i < diceArray.length; i++) {
 				scene.remove(diceArray[i][0]);
 				world.removeBody(diceArray[i][1]);
@@ -1249,11 +1249,45 @@ define([
 				lastRoll = "";
 				presentScore = 0;
 				for (let i = 0; i < diceArray.length; i++) {
-					scene.add(diceArray[i][0]);
-					world.addBody(diceArray[i][1]);
+					let rollingForce;
+					if (sharedRolling != null) {
+						rollingForce = new THREE.Vector3(sharedRolling.x, sharedRolling.y, sharedRolling.z);
+					} else {
+						rollingForce = ctx.rollingForce;
+					}
+					diceArray[i][1].angularVelocity.set(0.5, 0.5, 0.5);
+					diceArray[i][1].applyImpulse(sharedOffset != null ? sharedOffset : ctx.offset, rollingForce);
 					diceArray[i][1].position.set(0, 10, 0);
 				}
+				for (let i = 0; i < diceArray.length; i++) {
+					scene.add(diceArray[i][0]);
+					world.addBody(diceArray[i][1]);
+				}
+			} else {
+				for (let i = 0; i < dices.cube; i++) {
+					createCube();
+				}
+				for (let i = 0; i < dices.tetra; i++) {
+					createTetrahedron();
+				}
+				for (let i = 0; i < dices.octa; i++) {
+					createOctahedron();
+				}
+				for (let i = 0; i < dices.dodeca; i++) {
+					createDodecahedron();
+				}
+				for (let i = 0; i < dices.deca; i++) {
+					createDecahedron();
+				}
+				for (let i = 0; i < dices.icosa; i++) {
+					createIcosahedron();
+				}
+				lastRoll = "";
+				// if (ctx.showNumbers) {
+				//   getScore();
+				// }
 			}
+			
 		}
 
 		// Functions to get the scores of the dice.
