@@ -514,7 +514,7 @@ define([
 					presence.sendMessage(presence.getSharedInfo().id, {
 						user: presence.getUserInfo(),
 						action: "throw",
-						content: [ctx.offset, ctx.rollingForce]
+						content: [ctx.offset, ctx.rollingForce],
 					});
 				}
 			});
@@ -525,6 +525,9 @@ define([
 			.querySelector("#number-button")
 			.addEventListener("click", () => {
 				var numberButton = document.getElementById("number-button");
+				if (ctx.showNumbers){
+					return;
+				}
 				numberButton.classList.toggle("active");
 				document.getElementById("volume-button").style.backgroundImage =
 					"url(icons/number_volume.svg)";
@@ -548,13 +551,15 @@ define([
 		document
 			.querySelector("#transparent-button")
 			.addEventListener("click", () => {
+				if (ctx.toggleTransparent) {
+					return;
+				}
 				var transparentButton =
 					document.getElementById("transparent-button");
 				// Toggle the 'active' class on the clear button
 				transparentButton.classList.toggle("active");
 				document.getElementById("volume-button").style.backgroundImage =
 					"url(icons/transparent_volume.svg)";
-				console.log(defaultVolume);
 
 				if (defaultVolume) {
 					var defaultButton =
@@ -575,6 +580,9 @@ define([
 		document
 			.querySelector("#default-button")
 			.addEventListener("click", (event) => {
+				if (defaultVolume) {
+					return;
+				}
 				var defaultButton = document.getElementById("default-button");
 				// Toggle the 'active' class on the clear button
 				defaultButton.classList.toggle("active");
@@ -1251,12 +1259,19 @@ define([
 				for (let i = 0; i < diceArray.length; i++) {
 					let rollingForce;
 					if (sharedRolling != null) {
-						rollingForce = new THREE.Vector3(sharedRolling.x, sharedRolling.y, sharedRolling.z);
+						rollingForce = new THREE.Vector3(
+							sharedRolling.x,
+							sharedRolling.y,
+							sharedRolling.z
+						);
 					} else {
 						rollingForce = ctx.rollingForce;
 					}
 					diceArray[i][1].angularVelocity.set(0.5, 0.5, 0.5);
-					diceArray[i][1].applyImpulse(sharedOffset != null ? sharedOffset : ctx.offset, rollingForce);
+					diceArray[i][1].applyImpulse(
+						sharedOffset != null ? sharedOffset : ctx.offset,
+						rollingForce
+					);
 					diceArray[i][1].position.set(0, 10, 0);
 				}
 				for (let i = 0; i < diceArray.length; i++) {
@@ -1287,7 +1302,6 @@ define([
 				//   getScore();
 				// }
 			}
-			
 		}
 
 		// Functions to get the scores of the dice.
@@ -1476,104 +1490,134 @@ define([
 		}
 
 		function getIcosaScore(body, ifRemove) {
-			// Define the golden ratio
-			const phi = (1 + Math.sqrt(5)) / 2;
+			// // Define the golden ratio
+			// const phi = (1 + Math.sqrt(5)) / 2;
 
-			// Icosahedron face vectors
-			const faceVectors = [
-				{ vector: new THREE.Vector3(0, 1, phi).normalize(), face: 7 },
-				{ vector: new THREE.Vector3(0, -1, phi).normalize(), face: 16 },
-				{ vector: new THREE.Vector3(0, 1, -phi).normalize(), face: 4 },
-				{
-					vector: new THREE.Vector3(0, -1, -phi).normalize(),
-					face: 20,
-				},
-				{ vector: new THREE.Vector3(1, phi, 0).normalize(), face: 6 },
-				{ vector: new THREE.Vector3(-1, phi, 0).normalize(), face: 5 },
-				{ vector: new THREE.Vector3(1, -phi, 0).normalize(), face: 9 },
-				{
-					vector: new THREE.Vector3(-1, -phi, 0).normalize(),
-					face: 17,
-				},
-				{ vector: new THREE.Vector3(phi, 0, 1).normalize(), face: 15 },
-				{ vector: new THREE.Vector3(-phi, 0, 1).normalize(), face: 8 },
-				{ vector: new THREE.Vector3(phi, 0, -1).normalize(), face: 19 },
-				{
-					vector: new THREE.Vector3(-phi, 0, -1).normalize(),
-					face: 13,
-				},
-				{ vector: new THREE.Vector3(1, phi, phi).normalize(), face: 2 },
-				{
-					vector: new THREE.Vector3(-1, phi, phi).normalize(),
-					face: 1,
-				},
-				{
-					vector: new THREE.Vector3(1, -phi, phi).normalize(),
-					face: 11,
-				},
-				{
-					vector: new THREE.Vector3(-1, -phi, phi).normalize(),
-					face: 12,
-				},
-				{
-					vector: new THREE.Vector3(1, phi, -phi).normalize(),
-					face: 10,
-				},
-				{
-					vector: new THREE.Vector3(-1, phi, -phi).normalize(),
-					face: 3,
-				},
-				{
-					vector: new THREE.Vector3(1, -phi, -phi).normalize(),
-					face: 14,
-				},
-				{
-					vector: new THREE.Vector3(-1, -phi, -phi).normalize(),
-					face: 18,
-				},
-			];
+			// // Icosahedron face vectors
+			// const faceVectors = [
+			// 	{ vector: new THREE.Vector3(0, 1, phi).normalize(), face: 7 },
+			// 	{ vector: new THREE.Vector3(0, -1, phi).normalize(), face: 16 },
+			// 	{ vector: new THREE.Vector3(0, 1, -phi).normalize(), face: 4 },
+			// 	{
+			// 		vector: new THREE.Vector3(0, -1, -phi).normalize(),
+			// 		face: 20,
+			// 	},
+			// 	{ vector: new THREE.Vector3(1, phi, 0).normalize(), face: 6 },
+			// 	{ vector: new THREE.Vector3(-1, phi, 0).normalize(), face: 5 },
+			// 	{ vector: new THREE.Vector3(1, -phi, 0).normalize(), face: 9 },
+			// 	{
+			// 		vector: new THREE.Vector3(-1, -phi, 0).normalize(),
+			// 		face: 17,
+			// 	},
+			// 	{ vector: new THREE.Vector3(phi, 0, 1).normalize(), face: 15 },
+			// 	{ vector: new THREE.Vector3(-phi, 0, 1).normalize(), face: 8 },
+			// 	{ vector: new THREE.Vector3(phi, 0, -1).normalize(), face: 19 },
+			// 	{
+			// 		vector: new THREE.Vector3(-phi, 0, -1).normalize(),
+			// 		face: 13,
+			// 	},
+			// 	{ vector: new THREE.Vector3(1, phi, phi).normalize(), face: 2 },
+			// 	{
+			// 		vector: new THREE.Vector3(-1, phi, phi).normalize(),
+			// 		face: 1,
+			// 	},
+			// 	{
+			// 		vector: new THREE.Vector3(1, -phi, phi).normalize(),
+			// 		face: 11,
+			// 	},
+			// 	{
+			// 		vector: new THREE.Vector3(-1, -phi, phi).normalize(),
+			// 		face: 12,
+			// 	},
+			// 	{
+			// 		vector: new THREE.Vector3(1, phi, -phi).normalize(),
+			// 		face: 10,
+			// 	},
+			// 	{
+			// 		vector: new THREE.Vector3(-1, phi, -phi).normalize(),
+			// 		face: 3,
+			// 	},
+			// 	{
+			// 		vector: new THREE.Vector3(1, -phi, -phi).normalize(),
+			// 		face: 14,
+			// 	},
+			// 	{
+			// 		vector: new THREE.Vector3(-1, -phi, -phi).normalize(),
+			// 		face: 18,
+			// 	},
+			// ];
 
-			let closestFace = null;
-			let closestDot = -1; // Initialize with the smallest possible dot product
+			// let closestFace = null;
+			// let closestDot = -1; // Initialize with the smallest possible dot product
 
-			// Reference vector pointing up
-			let upVector = new THREE.Vector3(0, 1, 0);
+			// // Reference vector pointing up
+			// let upVector = new THREE.Vector3(0, 1, 0);
 
-			for (const faceVector of faceVectors) {
-				// Apply the body's quaternion to the face vector
-				let worldVector = faceVector.vector
+			// for (const faceVector of faceVectors) {
+			// 	// Apply the body's quaternion to the face vector
+			// 	let worldVector = faceVector.vector
+			// 		.clone()
+			// 		.applyQuaternion(body.quaternion);
+
+			// 	// Calculate the dot product with the up vector
+			// 	let dot = worldVector.dot(upVector);
+
+			// 	// Check if this is the closest to pointing up
+			// 	if (dot > closestDot) {
+			// 		closestDot = dot;
+			// 		closestFace = faceVector;
+			// 	}
+			// }
+
+			// if (closestFace) {
+			// 	let faceNumber = closestFace.face;
+			// 	if (!ifRemove) {
+			// 		lastRoll += faceNumber + " + ";
+			// 		presentScore += faceNumber;
+			// 		updateElements();
+			// 	}
+			// 	for (let i = 0; i < diceArray.length; i++) {
+			// 		if (body == diceArray[i][0]) {
+			// 			diceArray[i][7] = faceNumber;
+			// 		}
+			// 	}
+			// 	for (let i = 0; i < diceArray.length; i++) {
+			// 		if (body == diceArray[i][0]) {
+			// 			diceArray[i][7] = faceNumber;
+			// 		}
+			// 	}
+			// 	return faceNumber;
+			// }
+
+			let vector = new THREE.Vector3(0, 1);
+			let closest_face;
+			let closest_angle = Math.PI * 2;
+
+			let normals = body.geometry.getAttribute("normal").array;
+			for (let i = 0; i < 20; ++i) {
+				let face = i + 1;
+
+				//Each group consists in 3 vertices of 3 elements (x, y, z) so the offset between faces in the Float32BufferAttribute is 9
+				let startVertex = i * 9;
+				let normal = new THREE.Vector3(
+					normals[startVertex],
+					normals[startVertex + 1],
+					normals[startVertex + 2]
+				);
+				let angle = normal
 					.clone()
-					.applyQuaternion(body.quaternion);
-
-				// Calculate the dot product with the up vector
-				let dot = worldVector.dot(upVector);
-
-				// Check if this is the closest to pointing up
-				if (dot > closestDot) {
-					closestDot = dot;
-					closestFace = faceVector;
+					.applyQuaternion(body.quaternion)
+					.angleTo(vector);
+				if (angle < closest_angle) {
+					closest_angle = angle;
+					closest_face = face;
 				}
 			}
+			lastRoll += closest_face + " + ";
+			presentScore += closest_face;
+			updateElements();
 
-			if (closestFace) {
-				let faceNumber = closestFace.face;
-				if (!ifRemove) {
-					lastRoll += faceNumber + " + ";
-					presentScore += faceNumber;
-					updateElements();
-				}
-				for (let i = 0; i < diceArray.length; i++) {
-					if (body == diceArray[i][0]) {
-						diceArray[i][7] = faceNumber;
-					}
-				}
-				for (let i = 0; i < diceArray.length; i++) {
-					if (body == diceArray[i][0]) {
-						diceArray[i][7] = faceNumber;
-					}
-				}
-				return faceNumber;
-			}
+			return closest_face;
 		}
 
 		function getDodecaScore(body, ifRemove) {
@@ -1614,6 +1658,39 @@ define([
 					return faceVector.face;
 				}
 			}
+
+			// let vector = new THREE.Vector3(0, -1);
+			// let closest_face;
+			// let closest_angle = Math.PI * 2;
+
+			// let normals = body.geometry.getAttribute("normal").array;
+			// console.log(normals)
+			// for (let i = 0; i < 12; ++i) {
+			// 	let face = i + 1;
+
+			// 	//Each group consists in 3 vertices of 3 elements (x, y, z) so the offset between faces in the Float32BufferAttribute is 9
+			// 	let startVertex = i * 9;
+			// 	let normal = new THREE.Vector3(
+			// 		normals[startVertex],
+			// 		normals[startVertex + 1],
+			// 		normals[startVertex + 2]
+			// 	);
+			// 	let angle = normal
+			// 		.clone()
+			// 		.applyQuaternion(body.quaternion)
+			// 		.angleTo(vector);
+			// 	if (angle < closest_angle) {
+			// 		closest_angle = angle;
+			// 		closest_face = face;
+			// 	}
+			// }
+
+			// // switch(closest_face) {
+			// // }
+			// lastRoll += closest_face + " + ";
+			// presentScore += closest_face;
+			// updateElements();
+			// return closest_face;
 		}
 
 		function getDecaScore(body, ifRemove) {
