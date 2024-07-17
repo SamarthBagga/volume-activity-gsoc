@@ -1809,7 +1809,18 @@ define([
 		});
 
 		let awake = false;
-		const timeStep = 1 / 20;
+		let time = 20;
+		let timeStep = 1 / time;
+
+		document.querySelector("#increase-button").addEventListener('click', () => {
+			if (time == 5) {
+				alert("cant go lower")
+				return;
+			}
+			time -= 5;
+			timeStep = 1 / time;
+			document.getElementById("time").innerHTML = time;
+		})
 
 		animate();
 
