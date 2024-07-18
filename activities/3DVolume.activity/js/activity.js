@@ -1425,7 +1425,6 @@ define([
 			];
 			for (const faceVector of faceVectors) {
 				faceVector.vector.applyEuler(body.rotation);
-
 				if (Math.round(faceVector.vector.y) == 1) {
 					if (!ifRemove) {
 						lastRoll += faceVector.face + " + ";
@@ -1837,7 +1836,7 @@ define([
 				alert("cant go lower")
 				return;
 			}
-			time -= 5;
+			time -= 1;
 			timeStep = 1 / time;
 			document.getElementById("time").innerHTML = time;
 		})
