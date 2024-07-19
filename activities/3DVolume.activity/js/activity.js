@@ -1872,7 +1872,7 @@ define([
 
 		renderer.setAnimationLoop(animate);
 
-		const fixedTimeStep = 1 / 50; 
+		const fixedTimeStep = 1 / 40; 
 		const maxSubSteps = 3;
 
 		function updatePhysics() {
