@@ -186,8 +186,17 @@ function createDecahedron(
 		mass: 3, // Set mass
 		shape: decahedronShape2,
 		position: new CANNON.Vec3(x, y, z),
+		material: new CANNON.Material(),
 		restitution: 0.5,
 	});
+	const contactMat = new CANNON.ContactMaterial(
+		groundPhysMat,
+		decahedronBody.material,
+		{ friction: ctx.friction }
+	);
+
+	world.addContactMaterial(contactMat);
+
 	world.addBody(decahedronBody);
 	decahedronBody.sleepSpeedLimit = 4;
 	decahedronBody.sleepTimeLimit = 10;
@@ -218,6 +227,7 @@ function createDecahedron(
 		tempTextColor,
 		angVel1,
 		angVel2,
+		contactMat
 	]);
 }
 

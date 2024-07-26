@@ -203,7 +203,7 @@ function createDodecahedron(
 
 	let x = xCoordinateShared == null ? xCoordinate : xCoordinateShared;
 	let z = zCoordinateShared == null ? zCoordinate : zCoordinateShared;
-	let y = yCoordinateShared == null ? 10 : yCoordinateShared;
+	let y = yCoordinateShared == null ? 4 : yCoordinateShared;
 
 	let newGeometry = getGeometry2();
 
@@ -211,13 +211,20 @@ function createDodecahedron(
 		mass: 2, // Set mass
 		shape: dodecahedronShape,
 		position: new CANNON.Vec3(x, y, z),
-		friction: -1,
+		material: new CANNON.Material(),
 		restitution: 5,
 	});
 	dodecahedronBody.sleepSpeedLimit = 0.2;
 	dodecahedronBody.sleepTimeLimit = 3;
 
 	world.addBody(dodecahedronBody);
+	const contactMat = new CANNON.ContactMaterial(
+		groundPhysMat,
+		dodecahedronBody.material,
+		{ friction: ctx.friction }
+	);
+
+	world.addContactMaterial(contactMat);
 
 	let angVel1 =
 		sharedAngVel1 == null ? Math.random() * (1 - 0.1) + 0.1 : sharedAngVel1;
@@ -245,6 +252,7 @@ function createDodecahedron(
 		angVel1,
 		angVel2,
 		angVel3,
+		contactMat
 	]);
 }
 function getGeometry2() {
