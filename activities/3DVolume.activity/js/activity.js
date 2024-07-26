@@ -1050,6 +1050,7 @@ define([
 					wakeAll();
 				}
 			}
+			lastRollElement.textContent = "x- " + acceleration.x + ", " + "y- " + acceleration.y + ", " + "z- " + acceleration.x + " ";
 		}
 
 		// Wakes all the volumes so that they move towards the gravity.
@@ -1089,7 +1090,9 @@ define([
 			type: CANNON.Body.STATIC,
 			material: groundPhysMat,
 		});
-		groundBody.material.friction = 1;
+		groundBody.material.friction = 0;
+		groundBody.material.contactEquationStiffness = 1e8;
+		groundBody.material.contactEquationRelaxation = 3;
 		groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
 		world.addBody(groundBody);
 
@@ -1321,19 +1324,17 @@ define([
 			let textureLoader = new THREE.TextureLoader();
 			switch (selectedBoard) {
 				case "green-board":
-					console.log("now changing bg to green");
 					textureLoader.load(
 						"images/grass_background.png",
 						function (groundTexture) {
 							groundMesh.material.wireframe = false;
 							groundMesh.material.map = groundTexture;
 							groundMesh.material.needsUpdate = true;
-							groundBody.material.friction = 5;
+							groundBody.material.friction = 100;
 						}
 					);
 					break;
 				case "wood":
-					console.log("wood changing");
 					textureLoader.load(
 						"images/wood.png",
 						function (groundTexture) {
@@ -1341,7 +1342,7 @@ define([
 							groundMesh.material.color.setHex(0xf0c592);
 							groundMesh.material.map = groundTexture;
 							groundMesh.material.needsUpdate = true;
-							groundBody.material.friction = 3;
+							groundBody.material.friction = 60;
 						}
 					);
 					break;
@@ -1385,8 +1386,8 @@ define([
 							console.log(`Unknown type: ${diceArray[i][3]}`);
 							continue;
 					}
+					updateElements()
 				}
-				updateElements()
 			}
 		}
 
@@ -1400,17 +1401,6 @@ define([
 		let time = 20;
 		let timeStep = 1 / time;
 
-		document
-			.querySelector("#increase-button")
-			.addEventListener("click", () => {
-				if (time == 5) {
-					alert("cant go lower");
-					return;
-				}
-				time -= 1;
-				timeStep = 1 / time;
-				document.getElementById("time").innerHTML = time;
-			});
 
 		animate();
 

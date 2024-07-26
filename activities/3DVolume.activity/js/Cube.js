@@ -112,7 +112,6 @@ function createCube(
 		shape: new CANNON.Box(new CANNON.Vec3(1, 1, 1)),
 		position: new CANNON.Vec3(x, y, z),
 		material: boxPhysmat,
-		friction: 0.1,
 		restitution: 5,
 	});
 
@@ -129,7 +128,7 @@ function createCube(
 	const groundBoxContactMat = new CANNON.ContactMaterial(
 		groundPhysMat,
 		boxPhysmat,
-		{ friction: 0.5 }
+		{ friction: 0 }
 	);
 
 	world.addContactMaterial(groundBoxContactMat);
