@@ -1061,7 +1061,6 @@ define([
 				world.gravity.set(-9.81, -9.81, -9.81);
 			}
 		});
-		world.gravity.set(-3, -9.81, 0); // Gravity towards the right
 
 		function accelerationChanged(acceleration) {
 			if (!sensorMode) return;
@@ -1098,7 +1097,6 @@ define([
 					}
 				} else {
 					// front
-					if (acceleration.y > )
 					world.gravity.set(0, -9.81, -9.81); // Gravity towards the front
 					wakeAll();
 				}
