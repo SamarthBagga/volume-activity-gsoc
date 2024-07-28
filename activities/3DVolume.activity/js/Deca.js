@@ -27,7 +27,7 @@ for (let i = 0, b = 0; i < 10; ++i, b += (Math.PI * 2) / 10) {
 }
 vertices.push([0, 0, -1]);
 vertices.push([0, 0, 1]);
-let scaleFactor = 1;
+let scaleFactor = 1.5;
 let values = 10;
 let faceTexts = [
 	" ",
@@ -133,44 +133,51 @@ function createDecahedron(
 	let y = yCoordinateShared == null ? 10 : yCoordinateShared;
 
 	const sides = 10;
-	const verticesGeo = [
-		[0, 0, 1], // Top vertex
-		[0, 0, -1], // Bottom vertex
-	];
+	const scalingFactor = 1.5;
 
-	for (let i = 0; i < sides; ++i) {
-		const b = (i * Math.PI * 2) / sides;
-		verticesGeo.push([Math.cos(b), Math.sin(b), 0.105 * (i % 2 ? 1 : -1)]);
-	}
+const verticesGeo = [
+    [0, 0, scalingFactor * 1], // Top vertex
+    [0, 0, scalingFactor * -1], // Bottom vertex
+];
 
-	// Convert vertices to CANNON.Vec3 format
-	let verticesCannon2 = verticesGeo.map(
-		(v) => new CANNON.Vec3(v[0], v[1], v[2])
-	);
+for (let i = 0; i < sides; ++i) {
+    const b = (i * Math.PI * 2) / sides;
+    verticesGeo.push([
+        scalingFactor * Math.cos(b),
+        scalingFactor * Math.sin(b),
+        scalingFactor * 0.105 * (i % 2 ? 1 : -1),
+    ]);
+}
 
-	// Define faces
-	const facesGeo = [
-		[0, 2, 3],
-		[0, 3, 4],
-		[0, 4, 5],
-		[0, 5, 6],
-		[0, 6, 7],
-		[0, 7, 8],
-		[0, 8, 9],
-		[0, 9, 10],
-		[0, 10, 11],
-		[0, 11, 2],
-		[1, 3, 2],
-		[1, 4, 3],
-		[1, 5, 4],
-		[1, 6, 5],
-		[1, 7, 6],
-		[1, 8, 7],
-		[1, 9, 8],
-		[1, 10, 9],
-		[1, 11, 10],
-		[1, 2, 11],
-	];
+// Convert vertices to CANNON.Vec3 format
+let verticesCannon2 = verticesGeo.map(
+    (v) => new CANNON.Vec3(v[0], v[1], v[2])
+);
+
+// Define faces
+const facesGeo = [
+    [0, 2, 3],
+    [0, 3, 4],
+    [0, 4, 5],
+    [0, 5, 6],
+    [0, 6, 7],
+    [0, 7, 8],
+    [0, 8, 9],
+    [0, 9, 10],
+    [0, 10, 11],
+    [0, 11, 2],
+    [1, 3, 2],
+    [1, 4, 3],
+    [1, 5, 4],
+    [1, 6, 5],
+    [1, 7, 6],
+    [1, 8, 7],
+    [1, 9, 8],
+    [1, 10, 9],
+    [1, 11, 10],
+    [1, 2, 11],
+];
+
 
 	// Corrected face definition
 	let correctedFacesGeo = facesGeo.map((face) => {
