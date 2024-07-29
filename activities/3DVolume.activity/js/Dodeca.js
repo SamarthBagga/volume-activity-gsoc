@@ -234,6 +234,8 @@ function createDodecahedron(
 		sharedAngVel3 == null ? Math.random() * (1 - 0.1) + 0.1 : sharedAngVel3;
 
 	dodecahedronBody.angularVelocity.set(angVel1, angVel2, angVel3);
+	dodecahedronBody.angularDamping = 0.1; // This will help in reducing rotation over time
+
 	dodecahedronBody.applyImpulse(ctx.offset, ctx.rollingForce);
 	dodecahedron.position.copy(dodecahedronBody.position); // this merges the physics body to threejs mesh
 	dodecahedron.quaternion.copy(dodecahedronBody.quaternion);

@@ -53,7 +53,7 @@ let faceTexts = [
 	"19",
 	"20",
 ];
-let textMargin = 0.8;
+let textMargin = 1;
 let chamfer = 0.945;
 let af = (Math.PI * 6) / 5;
 let tab = 0;
@@ -76,7 +76,8 @@ function createDecahedron(
 	scene,
 	groundPhysMat,
 	sharedAngVel1,
-	sharedAngVel2
+	sharedAngVel2,
+	sharedAngVel3
 ) {
 	let decahedron;
 	let tempShowNumbers = ifNumbers == null ? ctx.showNumbers : ifNumbers;
@@ -124,9 +125,7 @@ function createDecahedron(
 	// decahedron = diceMesh;
 	scene.add(decahedron);
 
-
 	// Create vertices for the decahedron
-
 
 	let x = xCoordinateShared == null ? xCoordinate : xCoordinateShared;
 	let z = zCoordinateShared == null ? zCoordinate : zCoordinateShared;
@@ -135,49 +134,48 @@ function createDecahedron(
 	const sides = 10;
 	const scalingFactor = 1.5;
 
-const verticesGeo = [
-    [0, 0, scalingFactor * 1], // Top vertex
-    [0, 0, scalingFactor * -1], // Bottom vertex
-];
+	const verticesGeo = [
+		[0, 0, scalingFactor * 1], // Top vertex
+		[0, 0, scalingFactor * -1], // Bottom vertex
+	];
 
-for (let i = 0; i < sides; ++i) {
-    const b = (i * Math.PI * 2) / sides;
-    verticesGeo.push([
-        scalingFactor * Math.cos(b),
-        scalingFactor * Math.sin(b),
-        scalingFactor * 0.105 * (i % 2 ? 1 : -1),
-    ]);
-}
+	for (let i = 0; i < sides; ++i) {
+		const b = (i * Math.PI * 2) / sides;
+		verticesGeo.push([
+			scalingFactor * Math.cos(b),
+			scalingFactor * Math.sin(b),
+			scalingFactor * 0.105 * (i % 2 ? 1 : -1),
+		]);
+	}
 
-// Convert vertices to CANNON.Vec3 format
-let verticesCannon2 = verticesGeo.map(
-    (v) => new CANNON.Vec3(v[0], v[1], v[2])
-);
+	// Convert vertices to CANNON.Vec3 format
+	let verticesCannon2 = verticesGeo.map(
+		(v) => new CANNON.Vec3(v[0], v[1], v[2])
+	);
 
-// Define faces
-const facesGeo = [
-    [0, 2, 3],
-    [0, 3, 4],
-    [0, 4, 5],
-    [0, 5, 6],
-    [0, 6, 7],
-    [0, 7, 8],
-    [0, 8, 9],
-    [0, 9, 10],
-    [0, 10, 11],
-    [0, 11, 2],
-    [1, 3, 2],
-    [1, 4, 3],
-    [1, 5, 4],
-    [1, 6, 5],
-    [1, 7, 6],
-    [1, 8, 7],
-    [1, 9, 8],
-    [1, 10, 9],
-    [1, 11, 10],
-    [1, 2, 11],
-];
-
+	// Define faces
+	const facesGeo = [
+		[0, 2, 3],
+		[0, 3, 4],
+		[0, 4, 5],
+		[0, 5, 6],
+		[0, 6, 7],
+		[0, 7, 8],
+		[0, 8, 9],
+		[0, 9, 10],
+		[0, 10, 11],
+		[0, 11, 2],
+		[1, 3, 2],
+		[1, 4, 3],
+		[1, 5, 4],
+		[1, 6, 5],
+		[1, 7, 6],
+		[1, 8, 7],
+		[1, 9, 8],
+		[1, 10, 9],
+		[1, 11, 10],
+		[1, 2, 11],
+	];
 
 	// Corrected face definition
 	let correctedFacesGeo = facesGeo.map((face) => {
@@ -212,12 +210,14 @@ const facesGeo = [
 		sharedAngVel1 == null ? Math.random() * (1 - 0.1) + 0.1 : sharedAngVel1;
 	let angVel2 =
 		sharedAngVel2 == null ? Math.random() * (1 - 0.1) + 0.1 : sharedAngVel2;
+	let angVel3 =
+		sharedAngVel3 == null ? Math.random() * (1 - 0.1) + 0.1 : sharedAngVel3;
 
-	decahedronBody.angularVelocity.set(angVel1, angVel2, 0.5);
+	decahedronBody.angularVelocity.set(angVel1, angVel2, angVel3);
+	decahedronBody.angularDamping = 0.1; // This will help in reducing rotation over time
 	decahedronBody.applyImpulse(ctx.offset, ctx.rollingForce);
 	decahedron.position.copy(decahedronBody.position); // this merges the physics body to threejs mesh
 	decahedron.quaternion.copy(decahedronBody.quaternion);
-
 
 	if (quaternionShared != null && quaternionShared != undefined) {
 		decahedron.quaternion.copy(quaternionShared);
@@ -234,7 +234,8 @@ const facesGeo = [
 		tempTextColor,
 		angVel1,
 		angVel2,
-		contactMat
+		angVel3,
+		contactMat,
 	]);
 }
 
@@ -454,7 +455,6 @@ function calculateTextureSize(approx) {
 }
 
 function getDecaScore(scoresObject, body, ifRemove) {
-
 	let vector = new THREE.Vector3(0, 1);
 	let closest_face;
 	let closest_angle = Math.PI * 2;
