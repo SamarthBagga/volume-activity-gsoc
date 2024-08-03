@@ -197,7 +197,7 @@
 				<div class="arrow-container">
 					<button id="up-button" class="arrow-button"></button>
 					<div class="left-right-buttons">
-						<button	
+						<button
 							id="left-button"
 							class="arrow-button left"
 						></button>
@@ -216,5 +216,24 @@
 			id="unfullscreen-button"
 			title="UnFullscreen"
 		></button>
+		<script type="text/javascript">
+			requirejs.config({
+				baseUrl: "js",
+				paths: {
+					activity: "../js",
+				},
+			});
+			var l10n = null;
+			requirejs(["../lib/l10n"], function (il10n) {
+				l10n = il10n;
+			});
+			window.addEventListener(
+				"localized",
+				function () {
+					l10n.updateDocument();
+				},
+				false
+			);
+		</script>
 	</body>
 </html>

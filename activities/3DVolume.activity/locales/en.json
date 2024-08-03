@@ -47,5 +47,22 @@
 	"Sensor.title": "Sensor",
 	"StopButton.title": "Stop",
 	"Fullscreen.title": "Fullscreen",
-	"Help.title": "Tutorial"
+	"Help.title": "Tutorial",
+	"SelectBackground":"Select Background",
+	"GreenHighFriction":"Green Board (High Friction)",
+	"DefaultMediumFriction":"Default (Medium Friction)",
+	"WoodLowFriction":"Wood (Low Friction)",
+	"Red":"Red",
+	"Green":"Green",
+	"Blue":"Blue",
+	"Transparency.title":"Transparent Volume",
+	"Number.title":"Numered Volume",
+	"Default.title":"Default Volume",
+	"ZoomIn.title":"Zoom in button",
+	"ZoomOut.title":"Zoom out button",
+	"ZoomEqual.title":"Zoom equal button",
+	"ZoomTo.title":"Zoom to button"
+
+
+
 }
