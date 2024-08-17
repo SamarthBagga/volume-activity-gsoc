@@ -228,11 +228,15 @@ define([
 						);
 					}
 				}
-				console.log(diceArray);
 			}
-			if (msg.action == "throw") {
-				throwDice(msg.content[0], msg.content[1]);
+
+			if (msg.action == "positions") {
+				copyPositions(msg.content);
 			}
+			// if (msg.action == "throw") {
+			// 	copyPosition();
+			// 	throwDice(msg.content[0], msg.content[1]);
+			// }
 			if (msg.action == "changeBg") {
 				changeBoardBackground(msg.content);
 			}
@@ -716,6 +720,7 @@ define([
 		};
 
 		function onAddClick(event) {
+			throwingDice = true;
 			// This will be false only when tutorial is running.
 			if (!ifAdding.adding) {
 				return;
@@ -870,7 +875,7 @@ define([
 			}
 			// Find the volume being clicked within the diceArray to remove it.
 			if (intersectedObject == null) {
-				if (diceArray[index][3]) {
+				if (index < diceArray.length && diceArray[index][3]) {
 					// If the volume being removed is a numbered volume then get the number on top of the volume and remove it from the score.
 					let score;
 					switch (diceArray[index][2]) {
@@ -941,6 +946,7 @@ define([
 					console.log(scoresObject.presentScore);
 					num--;
 				}
+				console.log(diceArray);
 				console.log(diceArray[index][1]);
 				console.log(diceArray[index][0]);
 				world.removeBody(diceArray[index][1]);
@@ -1080,13 +1086,17 @@ define([
 					diceArray[i][9],
 				]);
 			}
-			console.log(diceArray);
 			presence.sendMessage(presence.getSharedInfo().id, {
 				user: presence.getUserInfo(),
 				action: "init",
 				content: [presenceDiceArray, presentBackground], // sends the diceArray and the present background of the user to the users which are joining
 			});
+			setTimeout(sendPositions, 4500);
+
+
 		};
+
+		
 
 		renderer.setSize(window.innerWidth, window.innerHeight);
 		const canvas = document.getElementById("game-container");
@@ -1485,6 +1495,7 @@ define([
 		// 	console.log(diceArray);
 		// }
 		function throwDice(sharedOffset, sharedRolling) {
+			throwingDice = true;
 			for (let i = 0; i < diceArray.length; i++) {
 				scene.remove(diceArray[i][0]);
 				world.removeBody(diceArray[i][1]);
@@ -1605,6 +1616,40 @@ define([
 			}
 		}
 
+		function sendPositions() {
+			let dicePositions = [];
+			for (let i = 0; i < diceArray.length; i++) {
+				dicePositions.push([
+					diceArray[i][1].position,
+					diceArray[i][1].quaternion,
+				]);
+			}
+			presence.sendMessage(presence.getSharedInfo().id, {
+				user: presence.getUserInfo(),
+				action: "positions",
+				content: dicePositions,
+			});
+		}
+
+		function copyPositions(positions) {
+			console.log("copying positions now")
+			for (let i = 0; i < diceArray.length; i++) {
+				scene.remove(diceArray[i][0]);
+				world.removeBody(diceArray[i][1]);
+			}
+			for (let i = 0; i < diceArray.length; i++) {
+				diceArray[i][0].position.copy(positions[i][0]);
+				diceArray[i][1].position.copy(positions[i][0]);
+				diceArray[i][1].quaternion.copy(positions[i][1]);
+				diceArray[i][1].quaternion.copy(positions[i][1]);
+			}
+			for (let i = 0; i < diceArray.length; i++) {
+				scene.add(diceArray[i][0]);
+				world.addBody(diceArray[i][1]);
+			}
+			awake = true;
+		}
+
 		// Leaving this here so that in the future contributors find it easier to debug the cannon-es physical world. Go to the animate function and uncomment the cannonDebugger line to view the physical world.
 
 		const cannonDebugger = new CannonDebugger(scene, world, {
@@ -1612,8 +1657,7 @@ define([
 		});
 
 		let awake = false;
-		let time = 20;
-		let timeStep = 1 / time;
+		let throwingDice = false;
 
 		animate();
 
@@ -1633,7 +1677,12 @@ define([
 			if (world.hasActiveBodies == false && awake == true) {
 				awake = false;
 				console.log("the world is going to sleep now bye bye");
-				for (let i = 0; i < diceArray.length; i++) {}
+				if (throwingDice) {
+					throwingDice = false;
+					if (presence) {
+						sendPositions();
+					}
+				}
 				getScores();
 			}
 			if (world.hasActiveBodies == true) {
