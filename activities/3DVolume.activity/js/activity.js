@@ -1693,6 +1693,7 @@ define([
 				diceArray[i][0]?.quaternion?.copy(diceArray[i][1].quaternion);
 			}
 			// console.log(world.hasActiveBodies);
+			// console.log(world.hasActiveBodies + "," + awake)
 			if (world.hasActiveBodies == false && awake == true) {
 				awake = false;
 				console.log("the world is going to sleep now bye bye");
