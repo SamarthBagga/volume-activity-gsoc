@@ -147,6 +147,7 @@ define([
 				ctx.textColor;
 
 			if (environment.sharedId) {
+				console.log(environment.sharedId)
 				console.log("Shared instance");
 				presence = activity.getPresenceObject(function (
 					error,
@@ -170,6 +171,9 @@ define([
 		);
 
 		var onNetworkDataReceived = function (msg) {
+			console.log("received data");
+			console.log(msg);
+			console.log(msg.action);
 			if (presence.getUserInfo().networkId === msg.user.networkId) {
 				return;
 			}
@@ -1052,6 +1056,7 @@ define([
 			document.getElementById("network-button"),
 			undefined
 		);
+		var isHost = false;
 		palette.addEventListener("shared", function () {
 			palette.popDown();
 			console.log("Want to share");
@@ -1064,6 +1069,8 @@ define([
 					"org.sugarlabs.3DVolume",
 					function (groupId) {
 						console.log("Activity shared");
+						isHost = true;
+						console.log(groupId)
 					}
 				);
 				network.onDataReceived(onNetworkDataReceived);
@@ -1072,28 +1079,32 @@ define([
 		});
 
 		var onNetworkUserChanged = function (msg) {
-			let presenceDiceArray = [];
-			for (let i = 0; i < diceArray.length; i++) {
-				// Handles the situation when the user already has some volume on the board before the connected user joins.
-				presenceDiceArray.push([
-					diceArray[i][2],
-					diceArray[i][1].position,
-					diceArray[i][1].quaternion,
-					diceArray[i][5],
-					diceArray[i][6],
-					diceArray[i][3],
-					diceArray[i][4],
-					diceArray[i][7],
-					diceArray[i][8],
-					diceArray[i][9],
-				]);
+			if (isHost) {
+				let presenceDiceArray = [];
+				for (let i = 0; i < diceArray.length; i++) {
+					// Handles the situation when the user already has some volume on the board before the connected user joins.
+					presenceDiceArray.push([
+						diceArray[i][2],
+						diceArray[i][1].position,
+						diceArray[i][1].quaternion,
+						diceArray[i][5],
+						diceArray[i][6],
+						diceArray[i][3],
+						diceArray[i][4],
+						diceArray[i][7],
+						diceArray[i][8],
+						diceArray[i][9],
+					]);
+				}
+				if (isHost) {
+					presence.sendMessage(presence.getSharedInfo().id, {
+						user: presence.getUserInfo(),
+						action: "init",
+						content: [presenceDiceArray, presentBackground], // sends the diceArray and the present background of the user to the users which are joining
+					});
+				}
+				setTimeout(sendPositions, 4500);
 			}
-			presence.sendMessage(presence.getSharedInfo().id, {
-				user: presence.getUserInfo(),
-				action: "init",
-				content: [presenceDiceArray, presentBackground], // sends the diceArray and the present background of the user to the users which are joining
-			});
-			setTimeout(sendPositions, 4500);
 		};
 
 		renderer.setSize(window.innerWidth, window.innerHeight);
@@ -1571,7 +1582,7 @@ define([
 		}
 		// This function calls the getScore functions for all the volumes and displays them.
 		function getScores() {
-			console.log("getting scores now")
+			console.log("getting scores now");
 			scoresObject.presentScore = 0;
 			scoresObject.lastRoll = "";
 			lastRollElement.textContent = "";
@@ -1629,7 +1640,6 @@ define([
 				action: "positions",
 				content: dicePositions,
 			});
-
 		}
 
 		function copyPositions(positions) {
@@ -1649,7 +1659,7 @@ define([
 				scene.add(diceArray[i][0]);
 				world.addBody(diceArray[i][1]);
 			}
-			getScores();
+			awake = true;
 		}
 
 		// Leaving this here so that in the future contributors find it easier to debug the cannon-es physical world. Go to the animate function and uncomment the cannonDebugger line to view the physical world.
@@ -1676,7 +1686,7 @@ define([
 				diceArray[i][0]?.position?.copy(diceArray[i][1].position);
 				diceArray[i][0]?.quaternion?.copy(diceArray[i][1].quaternion);
 			}
-			console.log(world.hasActiveBodies);
+			// console.log(world.hasActiveBodies);
 			if (world.hasActiveBodies == false && awake == true) {
 				awake = false;
 				console.log("the world is going to sleep now bye bye");
