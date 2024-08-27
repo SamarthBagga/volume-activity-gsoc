@@ -1188,7 +1188,8 @@ define([
 				);
 			} else {
 				sensorButton.classList.remove("active");
-				world.gravity.set(-9.81, -9.81, -9.81);
+				world.gravity.set(0, -9.81, 0);
+				wakeAll();
 			}
 		});
 
